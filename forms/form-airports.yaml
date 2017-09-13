@@ -1,0 +1,48 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        airport-lines:
+            draw:
+                lines:
+                    visible: true
+
+            taxiway:
+                draw:
+                    lines:
+                        visible: true
+
+    landuse:
+        bridges:
+            enabled: false
+
+        green:
+            enabled: false
+
+        parking:
+            enabled: false
+
+        ski:
+            enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons

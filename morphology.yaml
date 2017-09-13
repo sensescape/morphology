@@ -1,0 +1,396 @@
+# Author: Geraldine Sarmiento
+import:
+    # Styles
+    - styles/common.yaml
+    - styles/lines.yaml
+    - styles/polygons.yaml
+
+global:
+    # colors
+    black_color:                  [0.000,0.000,0.000]
+    dark_color:                   [0.000,0.000,0.000]
+    mid_color:                    [0.000,0.000,0.000]
+    white_color:                  [1.00,1.00,1.00]
+    brown_color:                  [0.760,0.659,0.608]
+
+    single_width: [[1, 1px], [8, 0.75px], [12, 0.5px], [15, 1px]]
+
+    # Sign up for a Mapzen API key to enjoy higher rate limits
+    # https://mapzen.com/documentation/overview/#developer-accounts-and-api-keys
+    sdk_mapzen_api_key: 'mapzen-Xz1zvxc'     # set this value to your Mapzen API key
+
+    # default order for basemap features
+    feature_order: function() { return feature.sort_rank || 0;; }
+    feature_order_down_1: function() { return feature.sort_rank - 1; }
+
+sources:
+    mapzen:
+        type: MVT
+        url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.mvt
+        url_params:
+            api_key: global.sdk_mapzen_api_key
+        rasters: [normals-elevation]
+        max_zoom: 16
+    normals-elevation:
+        type: Raster
+        url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png
+        url_params:
+            api_key: global.sdk_mapzen_api_key
+        max_zoom: 15
+
+cameras:
+    cam:
+        type: perspective
+
+scene:
+    background:
+        color: global.white_color
+
+layers:
+    earth:
+        data: { source: mapzen }
+        draw:
+            polygons:
+                style: grid
+                order: global.feature_order
+
+    water:
+        data: { source: mapzen, layer: water }
+        draw:
+            polygons:
+                style: grid
+                order: global.feature_order
+                color: global.white_color
+
+        river:
+            #river center lines, not boundaries for polygons
+            filter: { kind: [river,canal,stream,dam,ditch,drain], not: { is_tunnel: true } }
+            draw:
+                lines:
+                    order: global.feature_order_down_1
+                    color: global.white_color
+                    width: [[11, 2px], [18, 10px]]
+                    cap: round
+            intermittent:
+                filter:
+                    any:
+                        - intermittent: [true]
+                        - kind: drain
+                draw:
+                    lines:
+                        color: global.white_color
+
+    roads:
+        data: { source: mapzen, layer: roads }
+        draw:
+            lines:
+                order: global.feature_order
+                color: global.brown_color
+                width: global.single_width
+                outline:
+                    order: 352
+
+        natural_earth_highways:
+            filter: { $zoom: { max: 8 } }
+            draw:
+                lines:
+                    width: global.single_width
+
+        highway:
+            filter: { kind: highway }
+            link:
+                filter: { is_link: true } # on- and off-ramps, etc
+                draw:
+                    lines:
+                        color: global.black_color
+                        width: global.single_width
+
+
+        major_road:
+            filter: { kind: major_road }
+            link:
+                filter: { is_link: true } # on- and off-ramps, etc
+                draw:
+                    lines:
+                        color: global.black_color
+                        width: global.single_width
+
+
+            tertiary:
+                filter: { kind_detail: [tertiary, tertiary_link] }
+                link:
+                    filter: { is_link: true } # on- and off-ramps, etc
+                    draw:
+                        lines:
+                            color: global.black_color
+                            width: global.single_width
+
+        railway:
+            filter: { kind: rail, not: { kind_detail: [subway,light_rail,tram] } }
+            draw:
+                lines:
+                    color: global.black_color
+                    width: global.single_width
+                    order: global.feature_order
+
+            z18:
+                filter:
+                    $zoom: { min: 18 }
+                draw:
+                    lines:
+                        style: railway_dash
+
+            service:
+                filter: { service: true }
+                draw:
+                    lines:
+                        color: global.black_color
+                        width: global.single_width
+
+        airport-lines:
+            filter: { kind: aeroway, kind_detail: [runway,taxiway] }
+            draw:
+                lines:
+                    color: global.black_color
+                    cap: butt
+                    width: [[10, 1px], [13, 3px], [15, 18px], [17, 60m]]
+
+            not-round:
+                filter: { $zoom: { min: 17 } }
+                draw:
+                    lines:
+                        cap: butt
+            taxiway:
+                filter: { kind_detail: taxiway }
+                draw:
+                    lines:
+                        color: global.black_color
+                        width: [[11, 0.5px], [16, 2px], [18, 4m]]
+
+        winter_sport_pistes:
+            filter: { kind: piste }
+            draw:
+                lines:
+                    order: 388   # We override the server value here because Eraser Map is also a special Ski Map
+                    cap: round
+                    join: round
+                    color: global.black_color
+                    width: [[13, 0.5px], [16, 1px], [16, 2px], [18, 1m]]
+
+        aerialway:
+            filter: { kind: aerialway }
+            draw:
+                lines:
+                    color: global.black_color
+                    width: [[12, 1px], [14, 2px], [14, 6px]]
+            gondola_cable_car:
+                filter: { kind_detail: [gondola, cable_car] }
+                draw:
+                    lines:
+                        color: global.black_color
+                        width: [[12, 1px], [14, 2px], [14, 6px]]
+            chair_lift:
+                filter: { kind_detail: chair_lift }
+                draw:
+                    lines:
+                        color: global.black_color
+
+        racetracks:
+            filter: { kind_detail: raceway }
+            draw:
+                lines:
+                    cap: round
+                    join: round
+                    color: global.black_color
+                    width: global.single_width
+
+        piers:
+            filter: { kind: path, kind_detail: pier }
+            draw:
+                lines:
+                    color: global.black_color
+                    width: global.single_width
+
+        ferry:
+            filter: { kind: ferry }
+            draw:
+                lines:
+                    visible: false
+
+    buildings:
+        data: { source: mapzen, layer: buildings }
+        draw:
+            lines:
+                visible: false
+                order: global.feature_order
+
+        all-buildings:
+            filter:
+                any:
+                    # - not: { location: underground }
+                    - function() { return feature.min_zoom <= ($zoom-3) }
+                    - area: true
+            draw:
+                lines:
+                    color: global.black_color
+                    width: [[13, 0.35px], [17, 0.35px], [17, 1px]]
+                    visible: true
+                polygons:
+                    color: global.white_color
+                    order: global.feature_order
+
+    platforms:
+        data: { source: mapzen, layer: transit }
+        filter: { kind: platform }
+        polygon_geom:
+            filter: { $geometry: polygon }
+            draw:
+                lines:
+                    color: global.black_color
+                    width: 1px
+                    order: global.feature_order
+
+    landuse:
+        data: { source: mapzen }
+        draw:
+            polygons:
+                order: global.feature_order
+                visible: false
+            lines:
+                order: global.feature_order
+
+        bridges:
+            filter:
+                kind: bridge
+            draw:
+                polygons:
+                    visible: true
+                    style: landuse
+                    color: global.black_color
+
+        green:
+            filter:
+                any:
+                    - kind: [garden, park, national_park, battlefield, protected_area, nature_reserve, forest, natural_forest, natural_wood, natural_park, meadow, wood]
+                    - operator: [ "United States National Park Service", "United States Forest Service" ]
+                    - protect_class: ['2','3','5','6']
+            draw:
+                polygons:
+                    visible: true
+                    style: landuse
+                    color: global.black_color
+
+        parking:
+            filter:
+                kind: parking
+            draw:
+                polygons:
+                    visible: true
+                    style: parking
+                    color: global.brown_color
+
+        runway:
+            filter:
+                    kind: runway
+            draw:
+                polygons:
+                    visible: true
+                    color: global.black_color
+
+        ski:
+            filter:
+                    kind: [winter_sports]
+            draw:
+                polygons:
+                    style: landuse
+                    color: global.black_color
+                    order: 18
+                    visible: true
+
+styles:
+    landuse:
+        base: polygons
+        mix: [functions-zoom, elevation-dash]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                DASH_COLOR: vec3(1.000,1.000,1.000)
+                DASH_BACKGROUND_COLOR: vec3(0.200,0.200,0.200)
+                DASH_SCALE: 12.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+                DASH_DIR: vec3(-0.600,-0.420,0.560)
+                NORMAL_TEXTURE_INDEX: 0
+                DASH_MIN_SIZE: .9
+                DASH_MAX_SIZE: 1.
+                DASH_SIZE: shade
+
+    parking:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-dash]
+        shaders:
+            defines:
+                ZOOM_START: 12.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                DASH_SCALE: 15.
+                DASH_SIZE: 0.7
+                DASH_COLOR: vec3(1.00,1.00,1.00)
+                DASH_TILE_STYLE: tile
+                DASH_TYPE: fill
+
+    railway_dash:
+        base: lines
+        dash: [1, 0.15]
+        dash_background_color: global.white_color
+
+    tools-tilecoords:
+        shaders:
+            blocks:
+                global: |
+                    // Varying to be added to both vertex and fragment shaders
+                    varying vec2 v_pos;
+                    #ifdef TANGRAM_FRAGMENT_SHADER
+                    vec2 TileCoords() {
+                        return fract(v_pos);
+                    }
+                    #endif
+                position: |
+                    v_pos = modelPosition().xy;
+
+    tools-grid:
+        mix: tools-tilecoords
+        shaders:
+            blocks:
+                global: |
+                    #ifdef TANGRAM_FRAGMENT_SHADER
+                    bool grid(vec2 st, float res, float press) {
+                        vec2 grid = fract(st * res);
+                        return (grid.x < res * press) || (grid.y < res * press);
+                    }
+                    float TileGrid(float res) {
+                        vec2 st = TileCoords() * 100. * res;
+                        float pct = 0.0;
+                        float press = 0.4 + (1.0 - fract(u_map_position.z)) * 0.1;
+                        if (grid(st, 0.1, press)) { pct += 0.15; }
+                        return pct;
+                    }
+                    float TileGrid() {
+                        return mix(TileGrid(1.), TileGrid(2.), fract(u_map_position.z));
+                    }
+                    #endif
+    grid:
+        base: polygons
+        mix: [tools-grid]
+        shaders:
+            blocks:
+                filter: |
+                    color.rgb = vec3(1.00,1.00,1.00);
+                    color.rgb = mix(color.rgb, vec3(0.757,0.659,0.608), TileGrid());

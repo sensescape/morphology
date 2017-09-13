@@ -1,0 +1,59 @@
+layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+    roads:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        bridges:
+            enabled: false
+
+        green:
+            enabled: false
+
+        runway:
+            enabled: false
+
+        ski:
+            enabled: false
+
+        parking:
+            draw:
+                polygons:
+                    visible: true
+                    color: global.black_color
+
+styles:
+    no_grid:
+        base: polygons
+
+    parking:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-dash]
+        shaders:
+            defines:
+                ZOOM_START: 12.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                DASH_SCALE: 15.
+                DASH_SIZE: 0.7
+                DASH_COLOR: vec3(1.00,1.00,1.00)
+                DASH_TILE_STYLE: tile
+                DASH_TYPE: fill
+

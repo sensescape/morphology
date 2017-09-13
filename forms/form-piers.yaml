@@ -1,0 +1,35 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        piers:
+            draw:
+                lines:
+                    visible: true
+                    width: [[1, 1px], [15, 1px], [15, 2px]]
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+

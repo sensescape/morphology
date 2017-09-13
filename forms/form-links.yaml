@@ -1,0 +1,53 @@
+﻿global:
+    links_width: [[11, 0.5px], [17, 2px]]
+
+layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+    roads:
+        draw:
+            lines:
+                visible: false
+
+
+        highway:
+            link:
+                draw:
+                    lines:
+                        visible: true
+                        width: global.links_width
+
+        major_road:
+            link:
+                draw:
+                    lines:
+                        visible: true
+                        width: global.links_width
+
+            tertiary:
+                link:
+                    draw:
+                        lines:
+                            visible: true
+                            width: global.links_width
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons

@@ -1,0 +1,53 @@
+﻿global:
+    single_width: [[1, 1px], [8, 0.75px], [12, 0.5px], [15, 1px]]
+
+layers:
+    roads:
+        draw:
+            lines:
+                color: global.black_color
+
+        path:
+            filter:
+                all:
+                    - kind: [path, portage_way]
+                not:
+                    - kind_detail: [steps, track, pier]
+            draw:
+                lines:
+                    visible: false
+
+        track:
+            filter: { kind: path, kind_detail: track }
+            draw:
+                lines:
+                    visible: false
+
+        railway:
+            draw:
+                lines:
+                    visible: false
+
+        airport-lines:
+            draw:
+                lines:
+                    visible: false
+
+        ferry:
+            draw:
+                lines:
+                    visible: false
+
+        piers:
+            draw:
+                lines:
+                    visible: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false

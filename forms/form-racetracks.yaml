@@ -1,0 +1,20 @@
+﻿layers:
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        racetracks:
+            draw:
+                lines:
+                    visible: true
+                    width: [[13, 2px], [19, 10px], [19, 16px]]
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false

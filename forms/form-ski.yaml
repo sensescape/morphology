@@ -1,0 +1,68 @@
+layers:
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        winter_sport_pistes:
+            draw:
+                lines:
+                    visible: true
+
+        aerialway:
+            draw:
+                lines:
+                    visible: true
+            gondola_cable_car:
+                draw:
+                    lines:
+                        visible: true
+            chair_lift:
+                draw:
+                    lines:
+                        visible: true
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        bridges:
+            enabled: false
+
+        green:
+            enabled: false
+
+        parking:
+            enabled: false
+
+        runway:
+            enabled: false
+
+
+styles:
+    landuse:
+        base: polygons
+        mix: [functions-zoom, elevation-dash]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                # DASH_COLOR: vec3(0.000,0.000,0.000)
+                # DASH_BACKGROUND_COLOR: vec3(1.000,1.000,1.000)
+                DASH_COLOR: vec3(1.000,1.000,1.000)
+                DASH_BACKGROUND_COLOR: vec3(0.200,0.200,0.200)
+                DASH_SCALE: 12.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+                DASH_DIR: vec3(-0.600,-0.420,0.560)
+                NORMAL_TEXTURE_INDEX: 0
+                DASH_MIN_SIZE: .9
+                DASH_MAX_SIZE: 1.
+                DASH_SIZE: shade

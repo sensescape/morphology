@@ -1,0 +1,31 @@
+﻿layers:
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        tunnels:
+            filter: { is_tunnel: true }
+            draw:
+                lines:
+                    visible: true
+                    color: global.white_color
+                    width: [[1, 1px], [20, 2px]]
+                    outline:
+                        color: global.black_color
+                        width: [[1, 0.5px], [20, 5px]]
+                        order: global.feature_order
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+
+
+
+

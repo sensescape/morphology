@@ -1,0 +1,109 @@
+layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+                color: global.white_color
+
+        river:
+            draw:
+                lines:
+                    color: global.white_color
+                    width: [[11, 0.5px], [ 18, 8px]]
+            intermittent:
+                draw:
+                    lines:
+                        color: global.white_color
+
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        path:
+            filter:
+                all:
+                    - kind: [path, portage_way]
+                not:
+                    - kind_detail: [steps, pier]
+                    - landuse_kind: [residential, pedestrian, cemetery, grass, sports_centre]
+                any:
+                    - kind_detail: [pedestrian, footway, track, path]
+            draw:
+                lines:
+                    visible: true
+                    color: global.black_color
+                    width: [[9, 0.5px], [18, 1px], [18, 2px], [20, 1m]]
+
+            early:
+                filter:
+                    $zoom: { max: 15 }
+                draw:
+                    lines:
+                        order: 351
+
+        steps:
+            filter:
+                all:
+                    - kind: path
+                    - kind_detail: steps
+            draw:
+                dashed_steps:
+                    visible: true
+                    order: global.feature_order
+                    color: global.white_color
+                    width: [[9, 1px], [16, 2px], [16, 3px], [20, 1m]]
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        bridges:
+            enabled: false
+
+        parking:
+            enabled: false
+
+        runway:
+            enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+    landuse:
+        base: polygons
+        mix: [functions-zoom, elevation-dash]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                # DASH_COLOR: vec3(0.000,0.000,0.000)
+                # DASH_BACKGROUND_COLOR: vec3(1.000,1.000,1.000)
+                DASH_COLOR: vec3(1.000,1.000,1.000)
+                DASH_BACKGROUND_COLOR: vec3(0.200,0.200,0.200)
+                DASH_SCALE: 12.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+                DASH_DIR: vec3(-0.600,-0.420,0.560)
+                NORMAL_TEXTURE_INDEX: 0
+                DASH_MIN_SIZE: .9
+                DASH_MAX_SIZE: 1.
+                DASH_SIZE: shade
+
+    dashed_steps:
+        base: lines
+        dash: [0.75, 0.25]
+        dash_background_color: global.black_color

@@ -1,0 +1,30 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+    roads:
+        enabled: false
+
+    # buildings:
+    #     all-buildings:
+    #         draw:
+    #             lines:
+    #                 visible: true
+    #             polygons:
+    #                 visible: true
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+

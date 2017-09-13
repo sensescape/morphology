@@ -1,0 +1,55 @@
+﻿layers:
+    roads:
+        draw:
+            lines:
+                visible: false
+
+        railway:
+            draw:
+                lines:
+                    visible: true
+                    width: [[9, 0.5px], [15, 1px], [20, 6px], [20, 10px]]
+
+            z18:
+                draw:
+                    lines:
+                        visible: true
+
+            service:
+                draw:
+                    lines:
+                        visible: true
+                        width: [[13, 0.5px], [15, 1px], [20, 4px], [20, 6px]]
+
+    buildings:
+        all-buildings:
+            enabled: false
+
+        train-station:
+            filter:
+                landuse_kind: train_station
+                any:
+                    kind_detail: train_station
+            draw:
+                lines:
+                    color: global.black_color
+                    width: [[13, 0.5px], [18, 1px], [19, 2px]]
+                    visible: true
+                polygons:
+                    color: global.white_color
+                    order: global.feature_order
+
+    platforms:
+        polygon_geom:
+            draw:
+                lines:
+                    visible: true
+
+    landuse:
+        enabled: false
+
+styles:
+    railway_dash:
+        base: lines
+        dash: [1, 0.15]
+        dash_background_color: global.white_color

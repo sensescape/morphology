@@ -1,0 +1,34 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+        canals:
+            filter: { kind: canal }
+            draw:
+                lines:
+                    order: global.feature_order
+                    color: global.black_color
+                    width: [[11, 1px], [18, 4px], [18, 8px]]
+
+    roads:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
