@@ -15,7 +15,7 @@
                 lines:
                     order: global.feature_order
                     color: global.black_color
-                    width: [[11, 1px], [18, 4px], [18, 8px]]
+                    width: [[9, 3px], [18, 5px], [18, 8px]]
 
     roads:
         enabled: false

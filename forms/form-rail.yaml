@@ -1,4 +1,14 @@
 ﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
     roads:
         draw:
             lines:
@@ -53,3 +63,6 @@ styles:
         base: lines
         dash: [1, 0.15]
         dash_background_color: global.white_color
+
+    no_grid:
+        base: polygons

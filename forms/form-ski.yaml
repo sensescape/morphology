@@ -1,4 +1,14 @@
 layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
     roads:
         draw:
             lines:
@@ -43,6 +53,9 @@ layers:
 
 
 styles:
+    no_grid:
+        base: polygons
+
     landuse:
         base: polygons
         mix: [functions-zoom, elevation-dash]

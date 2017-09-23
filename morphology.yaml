@@ -291,7 +291,7 @@ layers:
 
         runway:
             filter:
-                    kind: runway
+                kind: runway
             draw:
                 polygons:
                     visible: true
@@ -299,7 +299,7 @@ layers:
 
         ski:
             filter:
-                    kind: [winter_sports]
+                kind: [winter_sports]
             draw:
                 polygons:
                     style: landuse

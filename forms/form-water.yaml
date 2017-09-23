@@ -1,4 +1,9 @@
 ﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
     water:
         draw:
             polygons:
@@ -30,6 +35,9 @@
         enabled: false
 
 styles:
+    no_grid:
+        base: polygons
+
     space-constant:
         shaders:
             blocks:

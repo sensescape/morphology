@@ -12,13 +12,11 @@
     roads:
         enabled: false
 
-    # buildings:
-    #     all-buildings:
-    #         draw:
-    #             lines:
-    #                 visible: true
-    #             polygons:
-    #                 visible: true
+    buildings:
+        all-buildings:
+            draw:
+                lines:
+                    width: [[13, 0.5px], [17, 1px]]
 
     landuse:
         enabled: false
