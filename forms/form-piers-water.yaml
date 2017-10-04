@@ -27,14 +27,11 @@
             lines:
                 visible: false
 
-        bridges:
-            filter: { is_bridge: true }
+        piers:
             draw:
                 lines:
                     visible: true
-                    color: global.black_color
-                    width: [[1, 1px], [17, 2px], [17, 3px]]
-
+                    width: [[1, 1px], [15, 1px], [15, 2px]]
 
     buildings:
         enabled: false
@@ -43,50 +40,11 @@
         enabled: false
 
     landuse:
-        green:
-            enabled: false
-
-        parking:
-            enabled: false
-
-        runway:
-            enabled: false
-
-        ski:
-            enabled: false
-
-        bridges:
-            draw:
-                polygons:
-                    visible: true
+        enabled: false
 
 styles:
     no_grid:
         base: polygons
-
-    landuse:
-        base: polygons
-        mix: [functions-zoom, elevation-dash]
-        shaders:
-            defines:
-                ZOOM_START: 14.
-                ZOOM_END: 18.
-                ZOOM_IN: .0
-                ZOOM_OUT: 1.
-
-                # DASH_COLOR: vec3(0.000,0.000,0.000)
-                # DASH_BACKGROUND_COLOR: vec3(1.000,1.000,1.000)
-                DASH_COLOR: vec3(1.000,1.000,1.000)
-                DASH_BACKGROUND_COLOR: vec3(0.200,0.200,0.200)
-                DASH_SCALE: 12.
-                DASH_SIZE: 0.9
-                DASH_TYPE: fill
-                DASH_TILE_STYLE: tile
-                DASH_DIR: vec3(-0.600,-0.420,0.560)
-                NORMAL_TEXTURE_INDEX: 0
-                DASH_MIN_SIZE: .9
-                DASH_MAX_SIZE: 1.
-                DASH_SIZE: shade
 
     space-constant:
         shaders:
@@ -223,3 +181,4 @@ styles:
                 color: |
                     vec2 st = getConstantCoords();
                     color = mix(vec4(color.rgb, 1.0), vec4(0.0), stripes(st*130.))*OPACITY; // transparent stripes
+
