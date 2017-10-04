@@ -1,0 +1,183 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: waves
+                color: global.mid_color
+
+        river:
+            draw:
+                lines:
+                    style: riverlines
+                    color: global.mid_color
+                    width: [[11, 2px], [ 18, 8px]]
+            intermittent:
+                draw:
+                    lines:
+                        style: coast
+                        color: global.mid_color
+
+        canals:
+            filter: { kind: canal }
+            draw:
+                lines:
+                    order: global.feature_order
+                    color: global.black_color
+                    width: [[9, 3px], [18, 5px], [18, 8px]]
+
+    roads:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+    space-constant:
+        shaders:
+            blocks:
+                global: |
+                    // Get the constant coordinates (glitches on zooms)
+                    // ================================
+                    vec2 getConstantCoords () {
+                        #ifdef TANGRAM_FRAGMENT_SHADER
+                        const float pixel_scale = 695.;
+                        float meter_pixels = u_meters_per_pixel / u_device_pixel_ratio;
+                        vec2 st = gl_FragCoord.xy/pixel_scale;
+                        const float dot_wrap = 1000.;
+                        st += mod(u_map_position.xy / meter_pixels, dot_wrap)/pixel_scale;
+                        return st;
+                        #else
+                        return vec2(0.0,0.0);
+                        #endif
+                    }
+
+    patterns-stripes:
+        mix: functions-aastep
+        shaders:
+            defines:
+                PI: 3.14159265358979323846
+            blocks:
+                global: |
+                    // Return a distance function of stripes
+                    float stripesDF (vec2 st) {
+                        return abs(sin(st.y*PI));
+                    }
+
+                    // Adjustable width stripes
+                    float stripes (vec2 st, float width) {
+                        return aastep(width,stripesDF(st));
+                    }
+
+                    // Faster optimisation of diagonal stripes
+                    float diagonalStripes (vec2 st) {
+                        vec2 i_st = floor(st);
+                        vec2 f_st = fract(st);
+                        if (mod(i_st.y,2.) - mod(i_st.x,2.) == 0.) {
+                            return 1.0 - aastep(f_st.x,f_st.y);
+                        } else {
+                            return aastep(f_st.x,f_st.y);
+                        }
+                    }
+
+    functions-aastep:
+        shaders:
+            extensions: OES_standard_derivatives
+            blocks:
+                global: |
+                    // AntiAliased Step function
+                    //=============================
+                    float aastep(float threshold, float value) {
+                        #ifdef TANGRAM_FRAGMENT_SHADER
+                            #ifdef TANGRAM_EXTENSION_OES_standard_derivatives
+                                float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+                                return smoothstep(threshold-afwidth, threshold+afwidth, value);
+                            #else
+                                return step(threshold, value);
+                            #endif
+                        #else
+                            return step(threshold, value);
+                        #endif
+                    }
+
+    waves:
+        base: polygons
+        mix: [space-constant, patterns-stripes]
+        shaders:
+            uniforms:
+                u_lighter: global.mid_color
+                u_lightest: global.white_color
+            blocks:
+                global: |
+                    float stripes2(vec2 st){
+                        return step(.3,1.0-smoothstep(.5,1.,abs(sin(st.y*3.14159265358))));
+                    }
+                filter: |
+                    vec2 st = getConstantCoords();
+
+                    const float wave_width = 30.0;
+                    const float wave_height = .01;
+                    st.y += sin(st.x*wave_width)*wave_height;
+
+                    // gradient
+                    color.rgb = mix(u_lighter, color.rgb, gl_FragCoord.x / u_resolution.x);
+                    color = mix(color,vec4(u_lightest,1.0),stripes(st*92.,.5))*1.0;
+
+    coast:
+        base: lines
+        mix: [space-constant]
+        blend: overlay
+        shaders:
+            defines:
+                OPACITY: 1.0
+            blocks:
+                global: |
+                    mat2 rotate2d(float angle){
+                        return mat2(cos(angle),-sin(angle),
+                                    sin(angle),cos(angle));
+                    }
+
+                    float stripes(vec2 st){
+                        st = rotate2d(3.14159265358*-0.25 )*st;
+                        //return step(.9,1.0-smoothstep(.5,1.,abs(sin(st.x*3.14159265358))));
+                        return step(.75,1.0-smoothstep(.75,1.,abs(sin(st.x*3.14159265358)))); // more spaced out stripes?
+                    }
+                color: |
+                    vec2 st = getConstantCoords();
+                    color = mix(vec4(color.rgb, 1.0), vec4(0.0), stripes(st*130.))*OPACITY; // transparent stripes
+
+    riverlines:
+        base: lines
+        mix: [space-constant]
+        blend: opaque
+        shaders:
+            defines:
+                OPACITY: 1.0
+            blocks:
+                global: |
+                    mat2 rotate2d(float angle){
+                        return mat2(cos(angle),-sin(angle),
+                                    sin(angle),cos(angle));
+                    }
+
+                    float stripes(vec2 st){
+                        st = rotate2d(3.14159265358*-0.25 )*st;
+                        //return step(.9,1.0-smoothstep(.5,1.,abs(sin(st.x*3.14159265358))));
+                        return step(.75,1.0-smoothstep(.75,1.,abs(sin(st.x*3.14159265358)))); // more spaced out stripes?
+                    }
+                color: |
+                    vec2 st = getConstantCoords();
+                    color = mix(vec4(color.rgb, 1.0), vec4(0.0), stripes(st*130.))*OPACITY; // transparent stripes

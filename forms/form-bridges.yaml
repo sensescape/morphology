@@ -20,7 +20,7 @@
                 lines:
                     visible: true
                     color: global.black_color
-                    width: [[1, 0.5px], [17, 1px], [17, 3px]]
+                    width: [[1, 1px], [17, 2px], [17, 3px]]
 
 
     buildings:

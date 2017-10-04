@@ -1,4 +1,14 @@
 layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
     roads:
         enabled: false
 
@@ -48,10 +58,13 @@ layers:
                 polygons:
                     order: global.feature_order
                     style: landuse
-                    color: global.mid_color
+                    color: global.black_color
                     visible: true
 
 styles:
+    no_grid:
+        base: polygons
+
     landuse:
         base: polygons
         mix: [functions-zoom, elevation-dash]

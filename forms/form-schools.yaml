@@ -58,7 +58,7 @@ layers:
                 polygons:
                     order: global.feature_order
                     style: landuse
-                    color: global.mid_color
+                    color: global.black_color
                     visible: true
 
 styles:

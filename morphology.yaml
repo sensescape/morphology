@@ -9,7 +9,7 @@ global:
     # colors
     black_color:                  [0.000,0.000,0.000]
     dark_color:                   [0.000,0.000,0.000]
-    mid_color:                    [0.000,0.000,0.000]
+    mid_color:                    [0.800,0.800,0.800]
     white_color:                  [1.00,1.00,1.00]
     brown_color:                  [0.760,0.659,0.608]
 
