@@ -1,0 +1,183 @@
+layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+        earth-labels:
+            draw:
+                text:
+                    priority: 5
+                    visible: true
+                    font:
+                        family: global.text_font_family
+                        fill: global.black_color
+                        size: global.text_size
+                        transform: global.text_case
+
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+        water-labels:
+            draw:
+                text:
+                    visible: true
+                    font:
+                        family: global.text_font_family
+                        fill: global.black_color
+                        size: global.text_size
+                        transform: global.text_case
+
+    roads:
+        enabled: false
+
+    buildings:
+        all-buildings:
+            enabled: false
+
+        building-labels:
+            draw:
+                text:
+                    priority: 70
+                    visible: true
+                    font:
+                        family: global.text_font_family
+                        fill: global.black_color
+                        size: global.text_size
+                        transform: global.text_case
+
+    platforms:
+        enabled: false
+
+    landuse:
+        landuse-labels:
+            draw:
+                text:
+                    priority: 40
+                    visible: true
+                    move_into_tile: true
+                    font:
+                        family: global.text_font_family
+                        fill: global.black_color
+                        size: global.text_size
+                        transform: global.text_case
+
+        bridges:
+            enabled: false
+
+        green:
+            enabled: false
+
+        parking:
+            enabled: false
+
+        runway:
+            enabled: false
+
+        ski:
+            enabled: false
+
+    roads-labels:
+        data: { source: mapzen, layer: roads }
+        draw:
+            text:
+                priority: 20
+                font:
+                    family: global.text_font_family
+                    fill: global.black_color
+                    size: global.text_size
+                    transform: global.text_case
+
+        shields:
+            filter:
+                shield_text: true
+            draw:
+                text:
+                    text_source: shield_text
+                    priority: 29
+                    font:
+                        fill: global.black_color
+                        size: global.text_size
+
+        other-labels:
+            filter:
+                kind: [piste, aerialway]
+            draw:
+                text:
+                    font:
+                        fill: global.black_color
+                        size: global.text_size
+
+    places:
+        data: { source: mapzen, layer: places }
+        filter:
+            all:
+                - name: true
+                - kind: [country, region, locality, borough, macrohood, neighbourhood]
+        draw:
+            text:
+                priority: 30
+                font:
+                    family: global.text_font_family
+                    fill: global.black_color
+                    size: global.text_size
+                    transform: global.text_case
+
+    pois:
+        data: { source: mapzen, layer: pois }
+        filter:
+            all:
+                - kind: true
+        draw:
+            text:
+                priority: 65
+                font:
+                    family: global.text_font_family
+                    fill: global.black_color
+                    size: global.text_size
+                    transform: global.text_case
+
+        highway-exit:
+            filter:
+                kind: motorway_junction
+            draw:
+                text:
+                    text_source: ref
+                    priority: 80
+                    font:
+                        fill: global.black_color
+                        size: global.text_size
+
+        airport:
+            filter:
+                kind: [airport, aerodrome]
+            draw:
+                text:
+                    text_source: iata
+                    priority: 42
+                    font:
+                        fill: global.black_color
+                        size: global.text_size
+                        transform: uppercase
+
+    boundaries:
+        data: { source: mapzen, layer: boundaries }
+        filter:
+            any:
+                - kind: true
+                - maritime_boundary: true
+        draw:
+            text:
+                priority: 10
+                font:
+                    family: global.text_font_family
+                    fill: global.black_color
+                    size: global.text_size
+                    transform: global.text_case
+
+styles:
+    no_grid:
+        base: polygons

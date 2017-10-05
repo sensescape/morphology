@@ -13,6 +13,10 @@ global:
     white_color:                  [1.00,1.00,1.00]
     brown_color:                  [0.760,0.659,0.608]
 
+    text_font_family:              'Cairo'
+    text_size:                     [[1,10px],[20,15px]]
+    text_case:                     lowercase
+
     single_width: [[1, 1px], [8, 0.75px], [12, 0.5px], [15, 1px]]
 
     # Sign up for a Mapzen API key to enjoy higher rate limits
@@ -38,6 +42,12 @@ sources:
             api_key: global.sdk_mapzen_api_key
         max_zoom: 15
 
+fonts:
+    Cairo:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/cairo/v1/ZA_4ooaF_Dfdn26t_IoQOaCWcynf_cDxXwCLxiixG1c.woff
+          url: fonts/ZA_4ooaF_Dfdn26t_IoQOaCWcynf_cDxXwCLxiixG1c.woff
+
 cameras:
     cam:
         type: perspective
@@ -53,6 +63,13 @@ layers:
             polygons:
                 style: grid
                 order: global.feature_order
+
+        earth-labels:
+            filter:
+                kind: true
+            draw:
+                text:
+                    visible: false
 
     water:
         data: { source: mapzen, layer: water }
@@ -79,6 +96,15 @@ layers:
                 draw:
                     lines:
                         color: global.white_color
+
+        water-labels:
+            filter:
+                all:
+                    - kind: true
+                    - name: true
+            draw:
+                text:
+                    visible: false
 
     roads:
         data: { source: mapzen, layer: roads }
@@ -239,6 +265,13 @@ layers:
                     color: global.white_color
                     order: global.feature_order
 
+        building-labels:
+            filter:
+                name: true
+            draw:
+                text:
+                    visible: false
+
     platforms:
         data: { source: mapzen, layer: transit }
         filter: { kind: platform }
@@ -258,6 +291,16 @@ layers:
                 visible: false
             lines:
                 order: global.feature_order
+
+        landuse-labels:
+            filter:
+                all:
+                    - label_placement: true
+                    - name: true
+                    - kind: true
+            draw:
+                text:
+                    visible: false
 
         bridges:
             filter:
@@ -299,7 +342,7 @@ layers:
 
         ski:
             filter:
-                kind: [winter_sports]
+                kind: winter_sports
             draw:
                 polygons:
                     style: landuse
