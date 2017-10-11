@@ -9,3 +9,5 @@ Morphology is both a map and tool created for the study of forms in cartography.
 ![Montreal](https://raw.githubusercontent.com/sensescape/morphology/master/images/montreal.png)
 
 Morphology is created by [Geraldine Sarmiento](https://twitter.com/sensescape).
+
+Presented at NACIS 2017 in Montréal.
