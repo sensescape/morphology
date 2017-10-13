@@ -18,7 +18,6 @@
         <link rel="stylesheet" href="https://mapzen.com/js/mapzen.css" />
         <!-- bog-standard leaflet URL hash -->
         <script src="https://mapzen.com/js/mapzen.js"></script>
-        <script src="hash.js"></script>
         <!-- A lightweight graphical user interface for changing variables in JavaScript.  -->
         <script type="text/javascript" src="lib/dat.gui.min.js"></script>
         <!-- FileSaver.js implements the HTML5 W3C saveAs(), used in the demo to save screenshots -->
@@ -156,7 +155,6 @@
               for (var val in valArrs) {
                 var keyAndValue = valArrs[val].split('=');
                 dObj[keyAndValue[0]] = decodeURIComponent(keyAndValue[1]);
-                console.log(dObj[keyAndValue[0]]);
               }
               return dObj;
             }
@@ -423,17 +421,16 @@
 
         map.setView([37.6193, -122.3763], 14);
 
-        var query = Formatter.parseHashToObj();
-
         var hash = L.Mapzen.hash({map: map});
+        var layer, scene;
 
         map.on('tangramloaded', function(e) {
+            layer = e.tangramLayer;
+            scene = layer.scene;
+        });
 
-            var layer = e.tangramLayer;
-            var scene = layer.scene;
-
-            /***** Render loop *****/
-
+        function addDatGui () {
+            var query = Formatter.parseHashToObj();
             // Create dat GUI
             var gui = new dat.GUI({ autoPlace: true });
 
@@ -534,8 +531,22 @@
                 gui.video_button.name('capture video');
                 gui.video_capture = false;
             }
-        });
+        }
 
+        function checkSceneToAddGui () {
+            // we can't say Tangram scene is available when dom is loaded
+            // so wait until tangram scene is loaded
+            if (scene) {
+                addDatGui();
+            } else {
+                setTimeout(checkSceneToAddGui, 100);
+            }
+        }
+
+        // Add dat.gui
+        window.addEventListener('load', function () {
+            checkSceneToAddGui();
+        });
         </script>
 
         <!-- Mapzen map UI -->
