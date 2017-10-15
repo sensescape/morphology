@@ -420,6 +420,8 @@
         var popup = document.getElementById('popup');
         var layer, scene;
 
+        L.Mapzen.geocoder().addTo(map);
+
         map.on('tangramloaded', function(e) {
             layer = e.tangramLayer;
             scene = layer.scene;
