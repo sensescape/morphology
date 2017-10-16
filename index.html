@@ -15,28 +15,15 @@
 
     <!-- 3rd party libraries -->
         <!-- Leaflet -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" />
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.js"></script>
+        <link rel="stylesheet" href="https://mapzen.com/js/mapzen.css" />
         <!-- bog-standard leaflet URL hash -->
-        <script type="text/javascript" src="https://cdn.rawgit.com/mlevans/leaflet-hash/master/leaflet-hash.js"></script>
-
-        <!-- Main tangram library -->
-        <!-- production -->
-        <script src="https://mapzen.com/tangram/0.13/tangram.min.js"></script>
-        <!-- production debug -->
-        <!-- <script src="https://mapzen.com/tangram/0.13/tangram.debug.js"></script> -->
-        <!-- dev -->
-        <!-- <script src="https://precog.mapzen.com/tangrams/tangram/master/dist/tangram.debug.js"></script> -->
-        <!-- dev branch -->
-        <!-- <script src="https://precog.mapzen.com/tangrams/tangram/placement-min-ratio/dist/tangram.debug.js"></script> -->
-
+        <script src="https://mapzen.com/js/mapzen.js"></script>
         <!-- A lightweight graphical user interface for changing variables in JavaScript.  -->
         <script type="text/javascript" src="lib/dat.gui.min.js"></script>
         <!-- FileSaver.js implements the HTML5 W3C saveAs(), used in the demo to save screenshots -->
         <script type="text/javascript" src="lib/FileSaver.js"></script>
         <!-- Keymaster handles keyboard input -->
-        <script type="text/javascript" src="lib/keymaster.js"></script>
-    <!-- End of 3rd party libraries -->
+
 
     <style>
         body {
@@ -107,12 +94,6 @@
             margin-left: 6px;
         }
 
-        hr {
-            border: 0;
-            height: 1px;
-            background: rgba(255,255,255,0.5);
-        }
-
         .coorner {
             position: absolute;
             background-color: rgba(255,255,255,0.0);
@@ -150,138 +131,316 @@
         }
     </style>
 </head>
-
     <body>
-        <div class="label" id="popup"></div>
         <div id="map"></div>
-
-
+        <div class="label" id="popup"></div>
         <!-- Demo module -->
         <script>
+        // for hash
+        var Formatter = {
+          parseHashToObj: function (_rawHash) {
+            var dObj = {};
+            var rawHash = _rawHash || window.location.hash;
 
-        /*** URL parsing ***/
-
-        var animated = true;
-        var url_search = window.location.search.slice(1);
-        if (url_search.length > 0) {
-            if (url_search.indexOf('animated=false') > -1) {
-                animated = false;
+            if (this.isEmpty(rawHash)) {
+              return null;
+            } else {
+              var hashVal = rawHash.replace('#', '');
+              var valArrs = hashVal.split('&');
+              for (var val in valArrs) {
+                var keyAndValue = valArrs[val].split('=');
+                dObj[keyAndValue[0]] = decodeURIComponent(keyAndValue[1]);
+              }
+              return dObj;
             }
-        }
+          },
+          isEmpty: function (str) {
+            if (str.length === 0 || !str) return true;
+            else return false;
+          }
+        };
 
-        // location
-        var url_hash = window.location.hash.slice(1).split('/'); // map location as #z/x/y
-        var map_start_location = [37.7926, -122.4003, 15]; // San Francisco
-        var defaultpos = true; // use default position
+        // Form theme selector
+        var form = {
+            'morphology (default)': 'morphology',
+            'airports z9+': 'airports',
+            'bridges z13+': 'bridges',
+            'bridges + water': 'bridges-water',
+            'buildings z13+': 'buildings',
+            'canals z9+': 'canals',
+            'canals + water': 'canals-water',
+            'citywalls': 'citywalls',
+            'earth': 'earth',
+            'farms': 'farms',
+            'green': 'green',
+            'industrial': 'industrial',
+            'labels': 'labels',
+            'libraries': 'libraries',
+            'links': 'links',
+            'parking': 'parking',
+            'piers z13+': 'piers',
+            'piers + water': 'piers-water',
+            'place of worship z14+': 'place-of-worship',
+            'quarries': 'quarries',
+            'racetracks z13+': 'racetracks',
+            'rail z11+': 'rail',
+            'roads z5+': 'roads',
+            'schools z13+': 'schools',
+            'ski z13+': 'ski',
+            'tunnels z13+': 'tunnels',
+            'water': 'water'
+        };
 
-        // location is passed through url
-        if (url_hash.length == 3) {
-            var defaultpos = false;
-            if (url_hash[1] > 180) { // parse hash as tile coordinates
-                // example: http://localhost:9001/#15/5242/12663
-                // add .5 to coords to center tile on screen
-                map_start_location = [tile2lat(parseFloat(url_hash[2]) + .5, url_hash[0]), tile2long(parseFloat(url_hash[1]) + .5, url_hash[0]), url_hash[0]];
-            }
-            else { // parse hash as lat/lng coordinates
-                map_start_location = [url_hash[1],url_hash[2], url_hash[0]];
-                // convert from strings
-                map_start_location = map_start_location.map(Number);
-            }
-        }
-
-        // enable setting language by URL argument
-        // eg: '?language=en&this=no'
-
-        var query = splitQueryParams();
-        // { language: 'en', this: 'no'}
-
-        function splitQueryParams () {
-           var str = window.location.search;
-
-           var kvArray = str.slice(1).split('&');
-           // ['language=en', 'this=no']
-
-           var obj = {};
-
-           for (var i = 0, j=kvArray.length; i<j; i++) {
-               var value = kvArray[i].split('=');
-               var k = window.decodeURIComponent(value[0]);
-               var v = window.decodeURIComponent(value[1]);
-
-               obj[k] = v;
-           }
-
-           return obj;
-        }
-
-        /*** Map ***/
-
-        var map = L.map('map',
-            {"keyboardZoomOffset" : .05, maxZoom: 20, "scrollWheelZoom": false }
-        );
-        map.setView(map_start_location.slice(0, 2), map_start_location[2]);
+        // Form theme selector
+        var bookmark = {
+            'select one': '',
+            'airports - APC': "15,38.21541,-122.27798",
+            'airports - DFW': "14,32.8963,-97.0399",
+            'airports - Florida': "11,30.5806,-86.7404",
+            'airports - IST': "14,40.9811,28.8154",
+            'airports - MHV': "14,35.0578,-118.1499",
+            'airports - NY': "11,40.7527,-74.0444",
+            'airports - ORD': "13.7,41.9792,-87.9050",
+            'airports - SAN': "15,32.73269,-117.19196",
+            'airports - SBA': "15,34.42505,-119.84155",
+            'airports - SFO': "14,37.6193,-122.3763",
+            'airports - YUL': "14,45.47112,-73.74047",
+            'bridges - Alexandria': "17,38.79381,-77.05581",
+            'bridges - Amsterdam': "14,52.3722,4.8959",
+            'bridges - Berlin z16': "16,52.5191,13.3971",
+            'bridges - Berlin z17': "17,52.52368,13.36962",
+            'bridges - Cairo': "13,30.0322,31.2262",
+            'bridges - Cape Town': "19,-33.90727,18.41098",
+            'bridges - Hamburg': "14,53.5379,10.0261",
+            'bridges - Newark z15': "15,40.71339,-74.14428",
+            'bridges - Neward z17': "17.5,40.74342,-74.15674",
+            'bridges - Philadelphia': "15,39.9566,-75.1638",
+            'bridges - Pittsburgh': "14,40.4430,-79.9979",
+            'bridges - Portland z15': "15,45.5203,-122.6669",
+            'bridges - Portland z17': "17,45.51814,-122.66716",
+            'bridges - Prague': "17.25,50.11425,14.44576",
+            'bridges - Shanghai': "17,31.14043,121.53223",
+            'bridges - Sinagpore': "16,1.2906,103.8644",
+            'bridges - Sydney': "16,-33.8560,151.2088",
+            'bridges - Venice': "17.5,45.43723,12.34008",
+            'bridges - Vienna': "19.5,48.20985,16.38432",
+            'buildings - Amsterdam': "16,52.3127,4.6612",
+            'buildings - Barcelona': "17,41.39208,2.15853",
+            'buildings - Brooklyn': "16.8,40.64056,-74.00848",
+            'buildings - Chevy Chase': "17.5,38.96326,-77.06675",
+            'buildings - Dhaka': "16.3,23.73261,90.33955",
+            'buildings - Hongkong': "16.2,22.28437,114.21678",
+            'buildings - Kolkata': "17,22.48150,88.36739",
+            'buildings - LA z17': "17,33.76991,-118.08559",
+            'buildings - LA z18': "18,33.84349,-118.15802",
+            'buildings - Lucca': "15.75,43.8443,10.5063",
+            'buildings - Manhattan': "17,40.75810,-73.97171",
+            'buildings - Manila': "18,14.50248,121.06074",
+            'buildings - Moscow': "16,55.7951,37.7985",
+            'buildings - Nördlingen': "16,48.8516,10.4891",
+            'buildings - Paris': "16,48.87271,2.29738",
+            'buildings - Phoenix': "18,33.44883,-112.07590",
+            'buildings - Stockholm': "16.25,59.34326,18.04132",
+            'buildings - Tallinn': "15,59.4357,24.7449",
+            'buildings - Toledo': "16,39.8583,-4.0258",
+            'buildings - Wash D.C.': "16.5,38.95434,-77.02126",
+            'canals - Bergamo': "13,45.6954,9.6673",
+            'canals - Fort Lauderdale': "12.75,26.2736,-80.2122",
+            'canals - Nagoya': "10,35.1002,136.9446",
+            'canals - Santos': "13.5,-23.9617,-46.3240",
+            'canals - South Florida': "9,26.2090,-80.3319",
+            'canals - Yanagawa': "15,33.1633,130.4037",
+            'citywalls - Cairo': "17,30.02947,31.26170",
+            'citywalls - Jerusalem': "16,31.77842,35.23193",
+            'citywalls - London': "18,51.50809,-0.07619",
+            'citywalls - Nicosia': "15.5,35.1762,33.3638",
+            'citywalls - Niterói': "19,-22.93798,-43.13349",
+            'farms - California': "14,38.2167,-121.2146",
+            'farms - Cerro Punta': "13,8.8579,-82.5837",
+            'farms - Hamburg': "15,53.62630,8.97976",
+            'farms - Nevada': "16,37.57554,-117.95240",
+            'farms - Nicaragua': "14,11.0619,-84.5882",
+            'farms - Utah': "15,40.1054,-111.9573",
+            'green - Barcelona': "15.5,41.4176,2.1594",
+            'green - Delhi': "16.75,28.59322,77.24909",
+            'green - London': "18.5,51.51650,-0.14510",
+            'green - Munich': "15.5,48.1279,11.6968",
+            'green - San Diego': "17,32.76558,-117.22644",
+            'green - San Francisco': "20,37.80210,-122.41881",
+            'green - Saint Petersburg': "18,59.93850,30.29247",
+            'green - Santiago': "15.25,-33.6037,-70.5496",
+            'green - Toronto': "14,43.7053,-79.3358",
+            'green - Versailles': "15,48.8100,2.1010",
+            'green - Vienna': "17,48.18245,16.30911",
+            'industrial - Jakarta': "17.5,-6.11008,106.90324",
+            'industrial - Karachi': "17.5,24.81239,66.97991",
+            'industrial - Le Havre': "16,49.47547,0.55098",
+            'industrial - Linden': "16,40.60805,-74.23770",
+            'industrial - Moscow': "14.75,55.8892,37.5502",
+            'industrial - Mumbai': "16,19.0308,73.1094",
+            'links - Athens': "16.25,37.94439,23.67000",
+            'links - Beijing z15': "15.5,40.1539,116.4776",
+            'links - Beijing z17': "17,39.86122,116.44842",
+            'links - Beijing z18': "18,39.89174,116.41252",
+            'links - Cologne': "16.5,50.95798,6.97045",
+            'links - Fez': "17,33.99146,-5.02538",
+            'links - Hong Kong': "16.5,22.28726,114.21740",
+            'links - Houston': "17,29.69754,-95.28841",
+            'links - Istanbul': "16,40.98138,29.09565",
+            'links - Rome': "16.5,41.92054,12.61136",
+            'links - San Antonio': "16,29.50086,-98.54860",
+            'links - Shanghai': "16,31.15869,121.64373",
+            'links - Singapore': "16,1.3713,103.9378",
+            'piers - Antibes': "16,43.5863,7.1265",
+            'piers - Blankenberge': "16,51.31141,3.11825",
+            'piers - Boston': "17,42.36208,-71.04884",
+            'piers - Chicago': "17,41.88533,-87.61145",
+            'piers - Copenhagen': "16,55.6667,12.6328",
+            'piers - Durban': "17,-29.86343,31.02357",
+            'piers - Hillsboro Beach': "16.4,26.26337,-80.08258",
+            'piers - Ipswich': "16,52.0499,1.1603",
+            'piers - San Francisco': "17,37.80669,-122.44387",
+            'piers - San Mateo': "17,37.58887,-122.31677",
+            'piers - Sydney': "15,-33.8534,151.1806",
+            'place of worship - Bangkok z16': "16,13.7492,100.4986",
+            'place of worship - Bangkok z18': "18,13.74578,100.49279",
+            'place of worhsip - Istanbul': "19,41.00525,28.97687",
+            'place of worship - Jerusalem': "19,31.77175,35.22927",
+            'place of worship - Kanchipuram': "18,12.81928,79.72537",
+            'place of worship - Karbala': "18,32.61660,44.03437",
+            'place of worship - Kyoto': "14,35.0011,135.7710",
+            'place of worship - Mecca': "15.75,21.4246,39.8244",
+            'place of worship - Medina': "16,24.46893,39.61087",
+            'place of worship - Paris': "19,48.85300,2.34986",
+            'place of worship - Rome': "19,41.89863,12.47682",
+            'place of worship - Tokyo': "17,35.71367,139.79635",
+            'racetracks - Austin': "16,30.1354,-97.6333",
+            'racetracks - Francorchamps': "15,50.4375,5.9691",
+            'racetracks - Homestead': "17,25.45182,-80.40862",
+            'racetracks - Indiantown': "16,26.92273,-80.30637",
+            'racetracks - Lime Rock': "17,41.92755,-73.38363",
+            'racetracks - Milton Keynes': "15,52.0720,-1.0163",
+            'racetracks - Nantes': "17.5,47.19822,-1.64053",
+            'racetracks - Nürburg': "18.2,50.32672,6.93251",
+            'racetracks - Rosamond': "16,34.8753,-118.2636",
+            'racetracks - Sao Paolo': "16.2,-23.70139,-46.69669",
+            'racetracks - Suzuka': "16,34.84375,136.53263",
+            'rail - Antwerp': "15,51.29312,4.38148",
+            'rail - Bangalore': "16,12.97664,77.56837",
+            'rail - Beijing': "14,39.9872,116.5207",
+            'rail - Belgrade': "14.7,44.7400,20.3729",
+            'rail - Bishkek': "13,42.8615,74.5922",
+            'rail - Bratislava': "18.75,48.19849,17.16449",
+            'rail - Bucharest': "19.5,44.46088,26.05699",
+            'rail - Cologne': "16.75,50.95249,6.94652",
+            'rail - Duisburg': "14,51.4961,6.7248",
+            'rail - Moscow': "13.4,55.7388,37.7276",
+            'rail - Nagoya': "17,35.19598,136.86574",
+            'rail - New Delhi': "16.5,28.64861,77.21859",
+            'rail - Osaka': "16.5,34.70428,135.49910",
+            'rail - Salzburg': "18,47.81310,13.04565",
+            'rail - Tashkent': "12.5,41.3044,69.3074",
+            'rail - Tokyo': "16.5,35.61419,139.73323",
+            'rail - Urumqi': "17,43.83930,87.52657",
+            'rail - Xian': "13.2,34.2871,108.8598",
+            'rail - Yokohama': "17.5,35.48108,139.63693",
+            'roads1 - Addis Ababa': "11,9.0116,38.7522",
+            'roads1 - Aleppo': "12,36.2101,37.1609",
+            'roads1 - Amman': "12,31.9523,35.9188",
+            'roads1 - Ankara': "10,39.9292,32.7873",
+            'roads1 - Baghdad': "11,33.3251,44.3697",
+            'roads1 - Bangkok': "10,13.8681,100.5579",
+            'roads1 - Beijing': "10,39.9176,116.3617",
+            'roads1 - Bucharest': "11,44.4438,26.0994",
+            'roads1 - Cairo': "9,30.0418,31.1270",
+            'roads1 - Christchurch': "11,-43.5115,172.6041",
+            'roads1 - Cologne': "11,50.9647,6.9440",
+            'roads1 - Damascus': "12,33.5218,36.2896",
+            'roads1 - Jakarta': "11,-6.2078,106.8304",
+            'roads1 - Johannesburg': "11,-26.1601,28.0357",
+            'roads1 - Kuala Lumpur': "10,3.1042,101.6455",
+            'roads1 - London': "9,51.4788,-0.1648",
+            'roads1 - Madrid': "11,40.4253,-3.7072",
+            'roads1 - Moscow': "10,55.7638,37.6062",
+            'roads1 - Munich': "11,48.1356,11.5727",
+            'roads1 - Paris': "11,48.8559,2.3305",
+            'roads1 - Seoul': "10,37.5601,126.9511",
+            'roads1 - Seville': "12,37.3891,-5.9745",
+            'roads1 - Tokyo': "10,35.6991,139.7653",
+            'roads2 - Chicago': "15,41.9309,-87.7493",
+            'roads2 - Colombo': "14,7.0695,79.9843",
+            'roads2 - Dasmarinas': "13,14.3219,120.9653",
+            'roads2 - Denpasar': "12.5,-8.4785,115.2630",
+            'roads2 - New York': "16,40.7554,-73.9867",
+            'roads2 - Paris': "16,48.8739,2.2949",
+            'roads2 - Tokyo': "15,35.7094,139.6277",
+            'schools - Baghdad': "15.5,33.2735,44.3801",
+            'schools - Barcelona': "17.5,41.38740,2.16329",
+            'schools - Beijing': "14,39.9943,116.3328",
+            'schools - Boston': "15,42.3564,-71.1040",
+            'schools - Fez': "19,34.06477,-4.97339",
+            'schools - Ithaca': "15,42.4507,-76.4743",
+            'schools - Manila': "14,14.6519,121.0626",
+            'schools - London': "17,51.49944,-0.17741",
+            'schools - Philadelphia': "15,39.9515,-75.1955",
+            'schools - Toronto': "16,43.66367,-79.39581",
+            'ski - French Alps': "13,45.5705,6.8147",
+            'ski - Vail': "13.1,39.60116,-106.34795",
+            'ski - Breckenridge z13': "13.8,39.4750,-106.0759",
+            'ski - Breckenridge z14': "14.5,39.6287,-105.8732",
+            'ski - Nevada': "15,39.2547,-119.9141",
+            'ski - California z13': "13.75,38.9397,-119.9114",
+            'ski - California z14': "14.5,39.1929,-120.2508",
+            'ski - Park City': "13,40.6509,-111.5269",
+            'ski - St. Moritz': "14,46.5100,9.8157",
+            'ski - Tignes': "14,45.4523,6.9219",
+            'ski - Tschaval': "13,45.8603,7.8333",
+            'tunnels - Barcelona': "13,41.4002,2.1557",
+            'tunnels - Los Angeles': "19.4,34.04957,-118.25107",
+            'tunnels - Paris': "13,48.8607,2.3358",
+            'water - Port Charlotte': "14,26.8944,-82.2725"
+        };
 
         var tg_baseScene = 'morphology.yaml';
-
         var tg_global = { sdk_mapzen_api_key: 'mapzen-Xz1zvxc' };
 
-        var layer = Tangram.leafletLayer({
-            // more: 'mapzen-n22UFkv'
-            // default (some): 'mapzen-iP15tWp'
-            // no: 'mapzen-7f8jPGR'
-            scene: { import: [tg_baseScene], global: tg_global },
-            attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a>, &copy; OSM contributors'
+        /*** Map ***/
+        L.Mapzen.apiKey = tg_global.sdk_mapzen_api_key;
+        var map = L.Mapzen.map('map', {
+            "keyboardZoomOffset" : .05,
+            "scrollWheelZoom": true,
+            tangramOptions: {
+                scene: tg_baseScene
+            }
         });
 
-        var scene = layer.scene;
-        var latlng = {};
-        var popup = document.getElementById('popup'); // click-popup
-        var hash = new L.Hash(map);
+        map.setView([37.6193, -122.3763], 14);
 
-        function updateKey(value) {
-            keytext = value;
+        var hash = L.Mapzen.hash({map: map});
+        var popup = document.getElementById('popup');
+        var layer, scene;
 
-            for (layer in scene.config.layers) {
-                if (layer == "morphology") continue;
-                scene.config.layers[layer].properties.key_text = value;
-            }
-            scene.rebuildGeometry();
-            scene.requestRedraw();
-        }
+        L.Mapzen.geocoder().addTo(map);
 
-        function updateValue(value) {
-            valuetext = value;
+        map.on('tangramloaded', function(e) {
+            layer = e.tangramLayer;
+            scene = layer.scene;
 
-            for (layer in scene.config.layers) {
-                if (layer == "morphology") continue;
-                scene.config.layers[layer].properties.value_text = value;
-            }
-            scene.rebuildGeometry();
-            scene.requestRedraw();
-        }
 
-        window.addEventListener('load', function () {
-            // Scene initialized
-            layer.scene.subscribe({
-                load: function (data) {
-                    data.config.global.sdk_animated = animated;
-                }
-            });
-            layer.addTo(map);
         });
 
         // Feature selection
+
         var picking = false;
-        function initFeatureSelection () {
+
+        function addHoverEvent () {
             layer.setSelectionEvents({
                 hover: function(selection) {
                     if (!picking) {
                         if (!selection || selection.feature == null || selection.feature.properties == null) {
-                            picking = false;
                             popup.style.visibility = 'hidden';
                             return;
                         }
-
                         var properties = selection.feature.properties;
                         popup.style.width = 'auto';
                         popup.style.left = (selection.pixel.x + 0) + 'px';
@@ -306,347 +465,147 @@
             anchor.href = url;
             anchor.target = '_blank';
             anchor.textContent = label;
-            anchor.addEventListener('click', function (event) {
-                trackOutboundLink(url, 'mapzen_carto_debug', type);
-            }, false);
             el.appendChild(anchor);
             return el;
         }
 
-        /**
-        * Function that tracks a click on an outbound link in Google Analytics.
-        * This function takes a valid URL string as an argument, and uses that URL string
-        * as the event label. Setting the transport method to 'beacon' lets the hit be sent
-        * using 'navigator.sendBeacon' in browser that support it.
-        */
-        function trackOutboundLink (url, post_name, editor) {
-           // ga('send', 'event', [eventCategory], [eventAction], [eventLabel], [eventValue], [fieldsObject]);
-           ga('send', 'event', 'outbound', post_name, url, {
-             'transport': 'beacon',
-             // If opening a link in the current window, this opens the url AFTER
-             // registering the hit with Analytics. Disabled because here want the
-             // link to open in a new window, so this hit can occur in the current tab.
-             //'hitCallback': function(){document.location = url;}
-           });
-        }
-
-        // convert tile coordinates to lat-lng
-        // from http://gis.stackexchange.com/questions/17278/calculate-lat-lon-bounds-for-individual-tile-generated-from-gdal2tiles
-        function tile2long(x,z) { return (x/Math.pow(2,z)*360-180); }
-        function tile2lat(y,z) {
-            var n=Math.PI-2*Math.PI*y/Math.pow(2,z);
-            return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
-        }
-
-        function long2tile(lon,zoom) { return (Math.floor((lon+180)/360*Math.pow(2,zoom))); }
-        function lat2tile(lat,zoom)  { return (Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom))); }
-
-        function mapzenTileURL() {
-            // find minimum max_zoom of all sources
-            var max_zoom = 16;
-            for (source in scene.config.sources) {
-                if (scene.config.sources.hasOwnProperty(source)) {
-                    if (scene.config.sources[source].max_zoom != "undefined") {
-                        // TODO: This will take 15 now, because the terrain source is
-                        // max_zoom 15, even though vector tiles are max_zoom 16
-                        max_zoom = Math.min(max_zoom, scene.config.sources[source].max_zoom);
-                    }
+        function addClickEvent () {
+            // Link to edit in OSM - hold 'e' and click
+            map.getContainer().addEventListener('dblclick', function (event) {
+                //console.log( 'dblclick was had' );
+                if( timer ) { clearTimeout( timer ); timer = null; }
+                popup.style.visibility = 'hidden';
+            });
+            var timer;
+            map.getContainer().addEventListener('mousemove', function (event) {
+                picking = false;
+                popup.style.visibility = 'hidden';
+                return;
+            });
+            layer.setSelectionEvents({
+                click: function(selection) {
+                    if( timer ) { clearTimeout( timer ); timer = null; }
+                    timer = setTimeout( function() {
+                        picking = true;
+                        latlng = selection.leaflet_event.latlng;
+                        var url = 'https://www.openstreetmap.org/edit?';
+                        if (!selection || selection.feature == null || selection.feature.properties == null) {
+                            picking = false;
+                            popup.style.visibility = 'hidden';
+                            return;
+                        }
+                        //console.log(selection.feature, selection.changed);
+                        // enable iD to show properties sidebar for selected feature
+                        osm_type = 'node';
+                        osm_zoom = '19'
+                        // tilezen adds sort_rank for any way or relation thing, but because we generate
+                        // label positions for area features, we need to do two tests
+                        if( selection.feature.properties.sort_rank || selection.feature.properties.area ) {
+                            osm_type = 'way';
+                            osm_zoom = Math.max( 17, map.getZoom() );
+                        }
+                        osm_id = selection.feature.properties.id;
+                        if( osm_id < 0 ) {
+                            osm_type = 'relation'
+                            osm_id = Math.abs( osm_id );
+                            // zoom out a bit because we assume this is a larger feature
+                            // but don't zoom out too far, as iD breaks
+                            osm_zoom = Math.max( 16, map.getZoom() );
+                        }
+                        url += osm_type + '=' + osm_id;
+                        // and position the map so it's at a similar zoom to Tangram
+                        if (latlng) {
+                            url += '#map=' + osm_zoom + '/' + latlng.lat + '/' + latlng.lng;
+                        }
+                        var properties = selection.feature.properties;
+                        var label = '';
+                        //console.log(properties);
+                        for (var x in properties) {
+                            var val = properties[x]
+                            label += "<span class='labelLine' key="+x+" value="+val+"'>"+x+" : "+val+"</span><br>"
+                        }
+                        if (label != '') {
+                            popup.style.left = (selection.pixel.x) + 'px';
+                            popup.style.top = (selection.pixel.y) + 'px';
+                            popup.style.margin = '0px';
+                            popup.innerHTML = '<span class="labelInner">' + label + '</span>';
+                        }
+                        // JOSM editor link
+                        var position = '19' + '/' + latlng.lat + '/' + latlng.lng;
+                        var josmUrl = 'http://www.openstreetmap.org/edit?editor=remote#map='+position;
+                        popup.appendChild(createEditLinkElement( url, 'iD', 'Edit with iD ➹') );
+                        popup.style.visibility = 'visible';
+                        timer = null;
+                    }, 200 );
                 }
-            }
-            var zoom = max_zoom < map.getZoom() ? max_zoom : Math.floor(map.getZoom());
-            var tileCoords = { x : long2tile(latlng.lng,zoom), y: lat2tile(latlng.lat,zoom), z: zoom };
-
-            var url = 'http://tile.mapzen.com/mapzen/vector/v1/all/' + zoom + '/' + tileCoords.x  + '/' + tileCoords.y + '.topojson';
-            return url;
+            });
         }
 
-        /***** Render loop *****/
+        function addDatGui () {
+            var query = Formatter.parseHashToObj();
+            // Create dat GUI
+            var gui = new dat.GUI({ autoPlace: true });
 
-        // Create dat GUI
-        var gui = new dat.GUI({ autoPlace: true });
-
-        function addGUI() {
             gui.domElement.parentNode.style.zIndex = 10000;
             window.gui = gui;
 
-            // Morphology
             var all_theme_imports = { form: null };
 
             function update_scene_with_themes() {
-                //console.log( all_theme_imports );
-
                 // construct the import array
                 themes_as_array = [tg_baseScene];
-
                 if( all_theme_imports.form ) {
                     themes_as_array.push( all_theme_imports.form );
                 }
 
                 scene.load({ import: themes_as_array, global: tg_global });
-                //console.log( scene.config );
                 scene.updateConfig();
-                //scene.rebuild();
             }
 
-            // Form theme selector
-            var form = {
-                'morphology (default)': 'morphology',
-                'airports z9+': 'airports',
-                'bridges z13+': 'bridges',
-                'bridges + water': 'bridges-water',
-                'buildings z13+': 'buildings',
-                'canals z9+': 'canals',
-                'canals + water': 'canals-water',
-                'citywalls': 'citywalls',
-                'earth': 'earth',
-                'farms': 'farms',
-                'green': 'green',
-                'industrial': 'industrial',
-                'labels': 'labels',
-                'libraries': 'libraries',
-                'links': 'links',
-                'parking': 'parking',
-                'piers z13+': 'piers',
-                'piers + water': 'piers-water',
-                'place of worship z14+': 'place-of-worship',
-                'quarries': 'quarries',
-                'racetracks z13+': 'racetracks',
-                'rail z11+': 'rail',
-                'roads z5+': 'roads',
-                'schools z13+': 'schools',
-                'ski z13+': 'ski',
-                'tunnels z13+': 'tunnels',
-                'water': 'water'
-            };
-            // use query language, else default to English
-            gui.form = query.form || 'morphology';
-            gui.add(gui, 'form', form).onChange(function(value) {
+            var formNames = [];
+            for (var key in form) {
+                formNames.push(key);
+            }
+
+            if (query.form) {
+                gui.form = query.form;
+                updateSceneWithForm(gui.form);
+            } else {
+                gui.form = 'morphology';
+            }
+
+            function updateSceneWithForm (value) {
                 var import_theme = 'forms/form-'+ value + '.yaml'
                 if( value === 'morphology') {
                     import_theme = value + '.yaml'
                 }
-
                 all_theme_imports.form = import_theme;
                 update_scene_with_themes();
+            }
 
-                //window.location.form = 'form=' + value;
+            function updateQuery (key, value) {
+                hash._hashData[key] = value;
+                hash._updateHash();
+            }
+
+            gui.add(gui, 'form', form).onChange(function(value) {
+                updateSceneWithForm(value);
+                updateQuery('form', value);
             });
 
+            // place bookmarks. This needs some modification
+            var bookmarkNames = [];
 
-            // Form theme selector
-            var bookmark = {
-                'airports - APC': "15,38.21541,-122.27798",
-                'airports - DFW': "14,32.8963,-97.0399",
-                'airports - Florida': "11,30.5806,-86.7404",
-                'airports - IST': "14,40.9811,28.8154",
-                'airports - MHV': "14,35.0578,-118.1499",
-                'airports - NY': "11,40.7527,-74.0444",
-                'airports - ORD': "13.7,41.9792,-87.9050",
-                'airports - SAN': "15,32.73269,-117.19196",
-                'airports - SBA': "15,34.42505,-119.84155",
-                'airports - SFO': "14,37.6193,-122.3763",
-                'airports - YUL': "14,45.47112,-73.74047",
-                'bridges - Alexandria': "17,38.79381,-77.05581",
-                'bridges - Amsterdam': "14,52.3722,4.8959",
-                'bridges - Berlin z16': "16,52.5191,13.3971",
-                'bridges - Berlin z17': "17,52.52368,13.36962",
-                'bridges - Cairo': "13,30.0322,31.2262",
-                'bridges - Cape Town': "19,-33.90727,18.41098",
-                'bridges - Hamburg': "14,53.5379,10.0261",
-                'bridges - Newark z15': "15,40.71339,-74.14428",
-                'bridges - Neward z17': "17.5,40.74342,-74.15674",
-                'bridges - Philadelphia': "15,39.9566,-75.1638",
-                'bridges - Pittsburgh': "14,40.4430,-79.9979",
-                'bridges - Portland z15': "15,45.5203,-122.6669",
-                'bridges - Portland z17': "17,45.51814,-122.66716",
-                'bridges - Prague': "17.25,50.11425,14.44576",
-                'bridges - Shanghai': "17,31.14043,121.53223",
-                'bridges - Sinagpore': "16,1.2906,103.8644",
-                'bridges - Sydney': "16,-33.8560,151.2088",
-                'bridges - Venice': "17.5,45.43723,12.34008",
-                'bridges - Vienna': "19.5,48.20985,16.38432",
-                'buildings - Amsterdam': "16,52.3127,4.6612",
-                'buildings - Barcelona': "17,41.39208,2.15853",
-                'buildings - Brooklyn': "16.8,40.64056,-74.00848",
-                'buildings - Chevy Chase': "17.5,38.96326,-77.06675",
-                'buildings - Dhaka': "16.3,23.73261,90.33955",
-                'buildings - Hongkong': "16.2,22.28437,114.21678",
-                'buildings - Kolkata': "17,22.48150,88.36739",
-                'buildings - LA z17': "17,33.76991,-118.08559",
-                'buildings - LA z18': "18,33.84349,-118.15802",
-                'buildings - Lucca': "15.75,43.8443,10.5063",
-                'buildings - Manhattan': "17,40.75810,-73.97171",
-                'buildings - Manila': "18,14.50248,121.06074",
-                'buildings - Moscow': "16,55.7951,37.7985",
-                'buildings - Nördlingen': "16,48.8516,10.4891",
-                'buildings - Paris': "16,48.87271,2.29738",
-                'buildings - Phoenix': "18,33.44883,-112.07590",
-                'buildings - Stockholm': "16.25,59.34326,18.04132",
-                'buildings - Tallinn': "15,59.4357,24.7449",
-                'buildings - Toledo': "16,39.8583,-4.0258",
-                'buildings - Wash D.C.': "16.5,38.95434,-77.02126",
-                'canals - Bergamo': "13,45.6954,9.6673",
-                'canals - Fort Lauderdale': "12.75,26.2736,-80.2122",
-                'canals - Nagoya': "10,35.1002,136.9446",
-                'canals - Santos': "13.5,-23.9617,-46.3240",
-                'canals - South Florida': "9,26.2090,-80.3319",
-                'canals - Yanagawa': "15,33.1633,130.4037",
-                'citywalls - Cairo': "17,30.02947,31.26170",
-                'citywalls - Jerusalem': "16,31.77842,35.23193",
-                'citywalls - London': "18,51.50809,-0.07619",
-                'citywalls - Nicosia': "15.5,35.1762,33.3638",
-                'citywalls - Niterói': "19,-22.93798,-43.13349",
-                'farms - California': "14,38.2167,-121.2146",
-                'farms - Cerro Punta': "13,8.8579,-82.5837",
-                'farms - Hamburg': "15,53.62630,8.97976",
-                'farms - Nevada': "16,37.57554,-117.95240",
-                'farms - Nicaragua': "14,11.0619,-84.5882",
-                'farms - Utah': "15,40.1054,-111.9573",
-                'green - Barcelona': "15.5,41.4176,2.1594",
-                'green - Delhi': "16.75,28.59322,77.24909",
-                'green - London': "18.5,51.51650,-0.14510",
-                'green - Munich': "15.5,48.1279,11.6968",
-                'green - San Diego': "17,32.76558,-117.22644",
-                'green - San Francisco': "20,37.80210,-122.41881",
-                'green - Saint Petersburg': "18,59.93850,30.29247",
-                'green - Santiago': "15.25,-33.6037,-70.5496",
-                'green - Toronto': "14,43.7053,-79.3358",
-                'green - Versailles': "15,48.8100,2.1010",
-                'green - Vienna': "17,48.18245,16.30911",
-                'industrial - Jakarta': "17.5,-6.11008,106.90324",
-                'industrial - Karachi': "17.5,24.81239,66.97991",
-                'industrial - Le Havre': "16,49.47547,0.55098",
-                'industrial - Linden': "16,40.60805,-74.23770",
-                'industrial - Moscow': "14.75,55.8892,37.5502",
-                'industrial - Mumbai': "16,19.0308,73.1094",
-                'links - Athens': "16.25,37.94439,23.67000",
-                'links - Beijing z15': "15.5,40.1539,116.4776",
-                'links - Beijing z17': "17,39.86122,116.44842",
-                'links - Beijing z18': "18,39.89174,116.41252",
-                'links - Cologne': "16.5,50.95798,6.97045",
-                'links - Fez': "17,33.99146,-5.02538",
-                'links - Hong Kong': "16.5,22.28726,114.21740",
-                'links - Houston': "17,29.69754,-95.28841",
-                'links - Istanbul': "16,40.98138,29.09565",
-                'links - Rome': "16.5,41.92054,12.61136",
-                'links - San Antonio': "16,29.50086,-98.54860",
-                'links - Shanghai': "16,31.15869,121.64373",
-                'links - Singapore': "16,1.3713,103.9378",
-                'piers - Antibes': "16,43.5863,7.1265",
-                'piers - Blankenberge': "16,51.31141,3.11825",
-                'piers - Boston': "17,42.36208,-71.04884",
-                'piers - Chicago': "17,41.88533,-87.61145",
-                'piers - Copenhagen': "16,55.6667,12.6328",
-                'piers - Durban': "17,-29.86343,31.02357",
-                'piers - Hillsboro Beach': "16.4,26.26337,-80.08258",
-                'piers - Ipswich': "16,52.0499,1.1603",
-                'piers - San Francisco': "17,37.80669,-122.44387",
-                'piers - San Mateo': "17,37.58887,-122.31677",
-                'piers - Sydney': "15,-33.8534,151.1806",
-                'place of worship - Bangkok z16': "16,13.7492,100.4986",
-                'place of worship - Bangkok z18': "18,13.74578,100.49279",
-                'place of worhsip - Istanbul': "19,41.00525,28.97687",
-                'place of worship - Jerusalem': "19,31.77175,35.22927",
-                'place of worship - Kanchipuram': "18,12.81928,79.72537",
-                'place of worship - Karbala': "18,32.61660,44.03437",
-                'place of worship - Kyoto': "14,35.0011,135.7710",
-                'place of worship - Mecca': "15.75,21.4246,39.8244",
-                'place of worship - Medina': "16,24.46893,39.61087",
-                'place of worship - Paris': "19,48.85300,2.34986",
-                'place of worship - Rome': "19,41.89863,12.47682",
-                'place of worship - Tokyo': "17,35.71367,139.79635",
-                'racetracks - Austin': "16,30.1354,-97.6333",
-                'racetracks - Francorchamps': "15,50.4375,5.9691",
-                'racetracks - Homestead': "17,25.45182,-80.40862",
-                'racetracks - Indiantown': "16,26.92273,-80.30637",
-                'racetracks - Lime Rock': "17,41.92755,-73.38363",
-                'racetracks - Milton Keynes': "15,52.0720,-1.0163",
-                'racetracks - Nantes': "17.5,47.19822,-1.64053",
-                'racetracks - Nürburg': "18.2,50.32672,6.93251",
-                'racetracks - Rosamond': "16,34.8753,-118.2636",
-                'racetracks - Sao Paolo': "16.2,-23.70139,-46.69669",
-                'racetracks - Suzuka': "16,34.84375,136.53263",
-                'rail - Antwerp': "15,51.29312,4.38148",
-                'rail - Bangalore': "16,12.97664,77.56837",
-                'rail - Beijing': "14,39.9872,116.5207",
-                'rail - Belgrade': "14.7,44.7400,20.3729",
-                'rail - Bishkek': "13,42.8615,74.5922",
-                'rail - Bratislava': "18.75,48.19849,17.16449",
-                'rail - Bucharest': "19.5,44.46088,26.05699",
-                'rail - Cologne': "16.75,50.95249,6.94652",
-                'rail - Duisburg': "14,51.4961,6.7248",
-                'rail - Moscow': "13.4,55.7388,37.7276",
-                'rail - Nagoya': "17,35.19598,136.86574",
-                'rail - New Delhi': "16.5,28.64861,77.21859",
-                'rail - Osaka': "16.5,34.70428,135.49910",
-                'rail - Salzburg': "18,47.81310,13.04565",
-                'rail - Tashkent': "12.5,41.3044,69.3074",
-                'rail - Tokyo': "16.5,35.61419,139.73323",
-                'rail - Urumqi': "17,43.83930,87.52657",
-                'rail - Xian': "13.2,34.2871,108.8598",
-                'rail - Yokohama': "17.5,35.48108,139.63693",
-                'roads1 - Addis Ababa': "11,9.0116,38.7522",
-                'roads1 - Aleppo': "12,36.2101,37.1609",
-                'roads1 - Amman': "12,31.9523,35.9188",
-                'roads1 - Ankara': "10,39.9292,32.7873",
-                'roads1 - Baghdad': "11,33.3251,44.3697",
-                'roads1 - Bangkok': "10,13.8681,100.5579",
-                'roads1 - Beijing': "10,39.9176,116.3617",
-                'roads1 - Bucharest': "11,44.4438,26.0994",
-                'roads1 - Cairo': "9,30.0418,31.1270",
-                'roads1 - Christchurch': "11,-43.5115,172.6041",
-                'roads1 - Cologne': "11,50.9647,6.9440",
-                'roads1 - Damascus': "12,33.5218,36.2896",
-                'roads1 - Jakarta': "11,-6.2078,106.8304",
-                'roads1 - Johannesburg': "11,-26.1601,28.0357",
-                'roads1 - Kuala Lumpur': "10,3.1042,101.6455",
-                'roads1 - London': "9,51.4788,-0.1648",
-                'roads1 - Madrid': "11,40.4253,-3.7072",
-                'roads1 - Moscow': "10,55.7638,37.6062",
-                'roads1 - Munich': "11,48.1356,11.5727",
-                'roads1 - Paris': "11,48.8559,2.3305",
-                'roads1 - Seoul': "10,37.5601,126.9511",
-                'roads1 - Seville': "12,37.3891,-5.9745",
-                'roads1 - Tokyo': "10,35.6991,139.7653",
-                'roads2 - Chicago': "15,41.9309,-87.7493",
-                'roads2 - Colombo': "14,7.0695,79.9843",
-                'roads2 - Dasmarinas': "13,14.3219,120.9653",
-                'roads2 - Denpasar': "12.5,-8.4785,115.2630",
-                'roads2 - New York': "16,40.7554,-73.9867",
-                'roads2 - Paris': "16,48.8739,2.2949",
-                'roads2 - Tokyo': "15,35.7094,139.6277",
-                'schools - Baghdad': "15.5,33.2735,44.3801",
-                'schools - Barcelona': "17.5,41.38740,2.16329",
-                'schools - Beijing': "14,39.9943,116.3328",
-                'schools - Boston': "15,42.3564,-71.1040",
-                'schools - Fez': "19,34.06477,-4.97339",
-                'schools - Ithaca': "15,42.4507,-76.4743",
-                'schools - Manila': "14,14.6519,121.0626",
-                'schools - London': "17,51.49944,-0.17741",
-                'schools - Philadelphia': "15,39.9515,-75.1955",
-                'schools - Toronto': "16,43.66367,-79.39581",
-                'ski - French Alps': "13,45.5705,6.8147",
-                'ski - Vail': "13.1,39.60116,-106.34795",
-                'ski - Breckenridge z13': "13.8,39.4750,-106.0759",
-                'ski - Breckenridge z14': "14.5,39.6287,-105.8732",
-                'ski - Nevada': "15,39.2547,-119.9141",
-                'ski - California z13': "13.75,38.9397,-119.9114",
-                'ski - California z14': "14.5,39.1929,-120.2508",
-                'ski - Park City': "13,40.6509,-111.5269",
-                'ski - St. Moritz': "14,46.5100,9.8157",
-                'ski - Tignes': "14,45.4523,6.9219",
-                'ski - Tschaval': "13,45.8603,7.8333",
-                'tunnels - Barcelona': "13,41.4002,2.1557",
-                'tunnels - Los Angeles': "19.4,34.04957,-118.25107",
-                'tunnels - Paris': "13,48.8607,2.3358",
-                'water - Port Charlotte': "14,26.8944,-82.2725"
-            };
-            // use query language, else default to SFO
-            gui.bookmark = query.bookmark || "14,37.6193,-122.3763";
-            gui.add(gui, 'bookmark', bookmark).onChange(function(value) {
-                var location_as_array = value.split(',')
+            for (var key in bookmark) {
+                bookmarkNames.push(key);
+            }
+
+            // gui.bookmark = query.bookmark || "airports - SFO";
+            gui.bookmark = 'select one';
+
+            gui.add(gui, 'bookmark', bookmarkNames).onChange(function(key) {
+                var location_as_array = bookmark[key].split(',');
                 map.setView(new L.LatLng(location_as_array[1], location_as_array[2]), location_as_array[0]);
-                //window.location.bookmark = 'bookmark=' + value;
             });
 
             // Enable/disable interactivity for all features
@@ -654,8 +613,8 @@
             gui[interactive_label] = false;
             gui.add(gui, interactive_label).onChange(function(value) {
                 scene.setIntrospection(value);
+                scene.updateConfig();
             });
-            scene.setIntrospection(gui[interactive_label]);
 
             // Take a screenshot and save to file
             gui.save_screenshot = function () {
@@ -693,142 +652,34 @@
                 gui.video_button.name('capture video');
                 gui.video_capture = false;
             }
-
-            // Link to edit in OSM - hold 'e' and click
-            map.getContainer().addEventListener('dblclick', function (event) {
-                //console.log( 'dblclick was had' );
-                if( timer ) { clearTimeout( timer ); timer = null; }
-                popup.style.visibility = 'hidden';
-            });
-
-            var timer;
-
-            map.getContainer().addEventListener('mousemove', function (event) {
-                picking = false;
-                popup.style.visibility = 'hidden';
-                return;
-            });
-
-            layer.setSelectionEvents({
-                click: function(selection) {
-                    if( timer ) { clearTimeout( timer ); timer = null; }
-                    timer = setTimeout( function() {
-                        picking = true;
-                        latlng = selection.leaflet_event.latlng;
-
-                        if( key.cmd || key.alt ) {
-                            window.open( mapzenTileURL(), '_blank' );
-                        } else {
-                            var url = 'https://www.openstreetmap.org/edit?';
-                            if (!selection || selection.feature == null || selection.feature.properties == null) {
-                                picking = false;
-                                popup.style.visibility = 'hidden';
-                                return;
-                            }
-                            //console.log(selection.feature, selection.changed);
-                            // enable iD to show properties sidebar for selected feature
-                            osm_type = 'node';
-                            osm_zoom = '19'
-                            // tilezen adds sort_rank for any way or relation thing, but because we generate
-                            // label positions for area features, we need to do two tests
-                            if( selection.feature.properties.sort_rank || selection.feature.properties.area ) {
-                                osm_type = 'way';
-                                osm_zoom = Math.max( 17, map.getZoom() );
-                            }
-                            osm_id = selection.feature.properties.id;
-                            if( osm_id < 0 ) {
-                                osm_type = 'relation'
-                                osm_id = Math.abs( osm_id );
-                                // zoom out a bit because we assume this is a larger feature
-                                // but don't zoom out too far, as iD breaks
-                                osm_zoom = Math.max( 16, map.getZoom() );
-                            }
-                            url += osm_type + '=' + osm_id;
-                            // and position the map so it's at a similar zoom to Tangram
-                            if (latlng) {
-                                url += '#map=' + osm_zoom + '/' + latlng.lat + '/' + latlng.lng;
-                            }
-
-                            if( key.shift ) {
-                                window.open(url, '_blank');
-                            } else {
-                                var properties = selection.feature.properties;
-
-                                var label = '';
-                                //console.log(properties);
-                                for (var x in properties) {
-                                    var val = properties[x]
-                                    label += "<span class='labelLine' key="+x+" value="+val+"'>"+x+" : "+val+"</span><br>"
-                                }
-
-                                if (label != '') {
-                                    popup.style.left = (selection.pixel.x) + 'px';
-                                    popup.style.top = (selection.pixel.y) + 'px';
-                                    popup.style.margin = '0px';
-                                    popup.innerHTML = '<span class="labelInner">' + label + '</span>';
-                                }
-
-                                // JOSM editor link
-                                var position = '19' + '/' + latlng.lat + '/' + latlng.lng;
-                                var josmUrl = 'http://www.openstreetmap.org/edit?editor=remote#map='+position;
-
-                                popup.appendChild(createEditLinkElement( url, 'iD', 'Edit with iD ➹') );
-                                popup.appendChild(createEditLinkElement( mapzenTileURL(), 'rawTile', 'View tile data ➹') );
-                                //popup.appendChild(createEditLinkElement( josmUrl, 'JOSM', 'Edit with JOSM ➹') );
-                                popup.style.visibility = 'visible';
-                            }
-                        }
-                        timer = null;
-                    }, 200 );
-                }
-            });
         }
 
-        function inIframe () {
-            try {
-                return window.self !== window.top;
-            } catch (e) {
-                return true;
+        function checkSceneToAddGui () {
+            // we can't say Tangram scene is available when dom is loaded
+            // so wait until tangram scene is loaded
+            if (scene) {
+                addDatGui();
+                addHoverEvent();
+                addClickEvent();
+            } else {
+                setTimeout(checkSceneToAddGui, 100);
             }
         }
 
-        // Add map
-        window.addEventListener('load', function () {
-            // Scene initialized
-            layer.on('init', function() {
-                var camera = scene.config.cameras[scene.getActiveCamera()];
-                // if a camera position is set in the scene file, use that
-                if (defaultpos && typeof camera.position != "undefined") {
-                    map_start_location = [camera.position[1], camera.position[0], camera.position[2]]
-                }
-                map.setView([map_start_location[0], map_start_location[1]], map_start_location[2]);
-
-                if (!inIframe()) {
-                    addGUI();
-                }
-            });
-            if (!inIframe()) {
-                map.scrollWheelZoom.enable();
-                initFeatureSelection();
+        // Add dat.gui
+        window.addEventListener('DOMContentLoaded', function () {
+            if (!map._isThisIframed()) {
+                checkSceneToAddGui();
             }
 
-            function addToMap () {
-                layer.addTo(map);
-            }
         });
 
-        </script>
-
-        <!-- Mapzen map UI -->
-        <script src='https://mapzen.com/common/ui/mapzen-ui.min.js'></script>
-        <script>
-            MPZN.bug({
-                name: 'Morphology',
-                link: 'https://github.com/sensescape/morphology',
-                tweet: 'Morphology',
-                repo: 'https://github.com/sensescape/morphology/'
-            });
-        </script>
-
+        L.Mapzen.bug({
+            name: 'Morphology',
+            link: 'https://github.com/sensescape/morphology',
+            tweet: 'Morphology',
+            repo: 'https://github.com/sensescape/morphology/'
+        });
+    </script>
   </body>
 </html>
