@@ -30,7 +30,7 @@
         width: 320px;
         padding: 6px 21px 6px 6px;
         border-radius: 5px;
-        background: rgba(255, 255, 248, 0.8);
+        background: rgba(255, 255, 255, 0.8);
         border: 2px solid rgba(0,0,0,0.2);;
         box-sizing: content-box;
       }
@@ -377,7 +377,6 @@
     var popup = document.getElementById('popup');
 
     var all_theme_imports = { form: null };
-    var query = Formatter.parseHashToObj();
 
     var layer, scene;
 
@@ -566,12 +565,6 @@
             updateSceneWithForm(value);
         });
 
-
-        if (query.form) {
-            formDropdown.value = query.form;
-            updateSceneWithForm(formDropdown.value);
-        }
-
         var bookmarkDropdown = this.getDropdown(bookmark, 'bookmark', function (value) {
             var location_as_array = value.split(',');
             map.setView(new L.LatLng(location_as_array[1], location_as_array[2]), location_as_array[0]);
@@ -598,27 +591,33 @@
 
         getDropdown: function (data, id, callback) {
 
-            var dropdownRow = L.DomUtil.create('div', 'row');
-            var dropdownLabel = L.DomUtil.create('label', 'control-label col-xs-4');
-            var labelString = id.charAt(0).toUpperCase() + id.slice(1);
+          var dropdownRow = L.DomUtil.create('div', 'row');
+          var dropdownLabel = L.DomUtil.create('label', 'control-label col-xs-4');
+          var labelString = id.charAt(0).toUpperCase() + id.slice(1);
 
-            dropdownLabel.textContent = labelString;
-            dropdownRow.appendChild(dropdownLabel);
+          dropdownLabel.textContent = labelString;
+          dropdownRow.appendChild(dropdownLabel);
 
-            var dropdown = L.DomUtil.create('select', 'mb-1 col-xs-8');
-            dropdown.id = id;
-            for (var key in data) {
-                var option = document.createElement('option');
-                option.value = data[key];
-                option.textContent = key;
-                dropdown.appendChild(option);
-            }
+          var dropdown = L.DomUtil.create('select', 'mb-1 col-xs-8');
+          dropdown.id = id;
+          for (var key in data) {
+              var option = document.createElement('option');
+              option.value = data[key];
+              option.textContent = key;
+              dropdown.appendChild(option);
+          }
 
-            dropdown.onchange = function () {
-                callback(dropdown.value);
-            }
-            dropdownRow.appendChild(dropdown);
-            return dropdownRow;
+          var query = Formatter.parseHashToObj();
+          if (query.form && id == 'form') {
+              dropdown.value = query.form;
+              updateSceneWithForm(dropdown.value);
+          }
+
+          dropdown.onchange = function () {
+              callback(dropdown.value);
+          }
+          dropdownRow.appendChild(dropdown);
+          return dropdownRow;
         },
 
         getScreenshotButton: function () {
