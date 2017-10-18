@@ -578,15 +578,46 @@
         var buttonRow = L.DomUtil.create('div','row text-center');
         var buttonCol = L.DomUtil.create('div','hidden-xs col-sm-12 pr-0');
 
-        buttonCol.appendChild(this.getScreenshotButton());
+        var self  = this;
+
+        buttonCol.appendChild(this.getButton('screenshot', function () {
+          scene.screenshot().then(function(screenshot) {
+          // uses FileSaver.js: https://github.com/eligrey/FileSaver.js/
+            saveAs(screenshot.blob, 'tangram-screenshot' + self.getFileNameSuffix() + '.png');
+          })
+        }));
+
         if (typeof window.MediaRecorder == 'function') {
-          buttonCol.appendChild(this.getVideoButton());
+          var videoRecording = false;
+          buttonCol.appendChild(this.getButton('record', function () {
+            if (!videoRecording) {
+              if (scene.startVideoCapture()) {
+                videoRecording = true;
+                document.getElementById('record').textContent = 'stop';
+              }
+            } else {
+              return scene.stopVideoCapture().then(function(video) {
+                videoRecording = false;
+                document.getElementById('record').textContent = 'record';
+                saveAs(video.blob, 'tangram-video-' + self.getFileNameSuffix() + '.webm');
+              });
+            }
+          }));
         }
         buttonRow.appendChild(buttonCol);
         containerDiv.appendChild(buttonRow);
 
         return containerDiv;
 
+       },
+
+       getFileNameSuffix: function () {
+          var timestamp = new Date();
+          var month = timestamp.getMonth()+1;
+          if( month < 10 ) { month = '0' + month; }
+          prettydate = timestamp.getFullYear() + month + timestamp.getDate() + timestamp.getHours() + timestamp.getMinutes();
+          map_location = map.getZoom() + '-' + map.getCenter().lat.toFixed(5) + '-' + map.getCenter().lng.toFixed(5);
+          return map_location + '-' + prettydate;
        },
 
         getDropdown: function (data, id, callback) {
@@ -620,46 +651,14 @@
           return dropdownRow;
         },
 
-        getScreenshotButton: function () {
-            var saveScreenshotButton = L.DomUtil.create('button', 'btn btn-secondary');
-            saveScreenshotButton.textContent = 'screenshot'
-            saveScreenshotButton.onclick = function () {
-              scene.screenshot().then(function(screenshot) {
-                // uses FileSaver.js: https://github.com/eligrey/FileSaver.js/
-                timestamp = new Date();
-                month = timestamp.getMonth()+1;
-                if( month < 10 ) { month = '0' + month; }
-                prettydate = timestamp.getFullYear() + month + timestamp.getDate() + timestamp.getHours() + timestamp.getMinutes();
-                map_location = map.getZoom() + '-' + map.getCenter().lat.toFixed(5) + '-' + map.getCenter().lng.toFixed(5);
-                saveAs(screenshot.blob, 'tangram-' + map_location + '-' + prettydate + '.png');
-              });
-            }
+        getButton: function (text, callback) {
+          var button = L.DomUtil.create('button', 'btn btn-secondary');
+          button.textContent = text;
+          button.id = text;
+          button.onclick = callback;
+          return button;
+        },
 
-            return saveScreenshotButton;
-       },
-       getVideoButton: function () {
-        var videoRecording = false;
-
-        var videoButton = L.DomUtil.create('button', 'btn btn-secondary');
-        videoButton.textContent = 'record';
-
-        videoButton.onclick = function () {
-          if (!videoRecording) {
-            if (scene.startVideoCapture()) {
-              videoRecording = true;
-              videoButton.textContent = 'stop';
-            }
-          } else {
-            return scene.stopVideoCapture().then(function(video) {
-              videoRecording = false;
-              videoButton.textContent = 'record';
-              saveAs(video.blob, 'tangram-video-' + (+new Date()) + '.webm');
-            });
-          }
-        };
-
-        return videoButton;
-       },
        getInteractiveCheckbox: function () {
           var checkboxRow = L.DomUtil.create('div', 'row');
           var checkboxWrapper = L.DomUtil.create('div', 'hidden-xs col-sm-12');
