@@ -32,6 +32,9 @@ layers:
                     lines:
                         visible: true
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

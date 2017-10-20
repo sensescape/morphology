@@ -20,6 +20,9 @@
                     visible: true
                     width: [[1, 1px], [15, 1px], [15, 2px]]
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

@@ -53,6 +53,9 @@ layers:
                 lines:
                     visible: false
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

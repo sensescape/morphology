@@ -59,6 +59,9 @@ layers:
                     color: global.white_color
                     width: [[9, 1px], [16, 2px], [16, 3px], [20, 1m]]
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

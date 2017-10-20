@@ -39,6 +39,9 @@ layers:
                             visible: true
                             width: global.links_width
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

@@ -243,6 +243,23 @@ layers:
                 lines:
                     visible: false
 
+    transit:
+        data: { source: mapzen, layer: transit }
+        filter:
+            kind: [subway, lightrail, tram]
+        draw:
+            lines:
+                color: global.black_color
+                order: 350
+                width: global.single_width
+
+        z18:
+            filter:
+                $zoom: { min: 18 }
+            draw:
+                lines:
+                    style: railway_dash
+
     buildings:
         data: { source: mapzen, layer: buildings }
         draw:

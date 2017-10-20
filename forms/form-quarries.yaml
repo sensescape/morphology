@@ -1,7 +1,13 @@
 layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
     water:
         draw:
             polygons:
+                style: no_grid
                 color: global.white_color
 
         river:
@@ -15,6 +21,9 @@ layers:
                         color: global.white_color
 
     roads:
+        enabled: false
+
+    transit:
         enabled: false
 
     buildings:
@@ -49,6 +58,9 @@ layers:
                     color: global.black_color
 
 styles:
+    no_grid:
+        base: polygons
+
     landuse:
         base: polygons
         mix: [functions-zoom, elevation-dash]
