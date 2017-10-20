@@ -10,4 +10,6 @@ Morphology is both a map and tool created for the study of forms in cartography.
 
 Morphology is created by [Geraldine Sarmiento](https://twitter.com/sensescape).
 
-Presented at NACIS 2017 in Montréal.
+Presented at the [2017 NACIS Conference](http://nacis.org/) in Montréal. Learn more about [Morphology](https://mapzen.com/blog/morphology/) at the Mapzen blog.
+
+Special thanks to Nathaniel Vaughn Kelso and Hanbyul Jo.
