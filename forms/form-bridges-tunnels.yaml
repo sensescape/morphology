@@ -1,4 +1,4 @@
-layers:
+﻿layers:
     earth:
         draw:
             polygons:
@@ -10,37 +10,40 @@ layers:
                 style: no_grid
 
     roads:
-        enabled: false
+        draw:
+            lines:
+                visible: false
+
+        bridges:
+            filter: { is_bridge: true }
+            draw:
+                lines:
+                    visible: true
+                    color: global.black_color
+                    width: [[1, 1px], [17, 2px], [17, 3px]]
+
+        tunnels:
+            filter: { is_tunnel: true }
+            draw:
+                lines:
+                    visible: true
+                    color: global.white_color
+                    width: [[1, 1px], [20, 2px]]
+                    outline:
+                        color: global.black_color
+                        width: [[1, 0.5px], [20, 5px]]
+                        order: global.feature_order
 
     transit:
         enabled: false
 
     buildings:
-        all-buildings:
-            enabled: false
-
-        library:
-            filter:
-                not: { location: underground }
-                landuse_kind: library
-                any:
-                    kind_detail: library
-            draw:
-                lines:
-                    color: global.black_color
-                    width: [[13, 0.5px], [18, 1px], [19, 2px]]
-                    visible: true
-                polygons:
-                    color: global.white_color
-                    order: global.feature_order
+        enabled: false
 
     platforms:
         enabled: false
 
     landuse:
-        bridges:
-            enabled: false
-
         green:
             enabled: false
 
@@ -53,15 +56,9 @@ layers:
         ski:
             enabled: false
 
-        #tier6:
-        library:
-            filter:
-                kind: library
+        bridges:
             draw:
                 polygons:
-                    order: global.feature_order
-                    style: landuse
-                    color: global.black_color
                     visible: true
 
 styles:
@@ -91,3 +88,9 @@ styles:
                 DASH_MIN_SIZE: .9
                 DASH_MAX_SIZE: 1.
                 DASH_SIZE: shade
+
+
+
+
+
+

@@ -26,6 +26,9 @@
                         width: [[1, 0.5px], [20, 5px]]
                         order: global.feature_order
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

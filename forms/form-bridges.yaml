@@ -22,6 +22,8 @@
                     color: global.black_color
                     width: [[1, 1px], [17, 2px], [17, 3px]]
 
+    transit:
+        enabled: false
 
     buildings:
         enabled: false

@@ -10,29 +10,13 @@
                 style: no_grid
 
     roads:
-        draw:
-            lines:
-                visible: false
-
-        railway:
-            draw:
-                lines:
-                    visible: true
-                    width: [[9, 0.5px], [15, 1px], [20, 6px], [20, 10px]]
-
-            z18:
-                draw:
-                    lines:
-                        visible: true
-
-            service:
-                draw:
-                    lines:
-                        visible: true
-                        width: [[13, 0.5px], [15, 1px], [20, 4px], [20, 6px]]
+        enabled: false
 
     transit:
-        enabled: false
+        draw:
+            lines:
+                visible: true
+                width: [[8, 0.5px], [15, 1px], [20, 6px]]
 
     buildings:
         all-buildings:
@@ -64,7 +48,7 @@
 styles:
     railway_dash:
         base: lines
-        dash: [1, 0.15]
+        dash: [1, 0.25]
         dash_background_color: global.white_color
 
     no_grid:

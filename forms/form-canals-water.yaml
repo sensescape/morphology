@@ -33,6 +33,9 @@
     roads:
         enabled: false
 
+    transit:
+        enabled: false
+
     buildings:
         enabled: false
 

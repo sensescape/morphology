@@ -12,6 +12,9 @@
     roads:
         enabled: false
 
+    transit:
+        enabled: false
+
     buildings:
         all-buildings:
             draw:

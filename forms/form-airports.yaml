@@ -24,6 +24,9 @@
                     lines:
                         visible: true
 
+    transit:
+        enabled: false
+
     landuse:
         bridges:
             enabled: false
