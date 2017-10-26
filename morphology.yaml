@@ -245,20 +245,25 @@ layers:
 
     transit:
         data: { source: mapzen, layer: transit }
-        filter:
-            kind: [subway, lightrail, tram]
         draw:
             lines:
                 color: global.black_color
                 order: 350
-                width: global.single_width
 
-        z18:
+        subway:
             filter:
-                $zoom: { min: 18 }
+                kind: subway
             draw:
                 lines:
-                    style: railway_dash
+                    width: 1px
+
+        other:
+            filter:
+                kind: [lightrail, tram]
+            draw:
+                lines:
+                    width: 1px
+
 
     buildings:
         data: { source: mapzen, layer: buildings }

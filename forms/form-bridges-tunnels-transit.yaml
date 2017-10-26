@@ -27,18 +27,28 @@
             draw:
                 lines:
                     visible: true
+                    style: no_dash
                     color: global.white_color
-                    width: [[1, 1px], [18, 4px], [20, 10px]]
+                    width: [[1, 1px], [20, 2px]]
                     outline:
+                        style: no_dash
                         color: global.black_color
-                        width: [[1, 0.5px], [20, 7px]]
+                        width: [[1, 0.5px], [20, 5px]]
                         order: global.feature_order
+
+            other-tunnels:
+                filter:
+                    kind_detail: [rail, trunk_link, primary_link, motorway_link]
+                draw:
+                    lines:
+                        color: global.white_color
+                        width: [[11, 1px], [18, 2px]]
 
     transit:
         draw:
             lines:
                 visible: true
-                width: [[8, 0.5px], [15, 1px], [20, 3px]]
+                style: transit_dash
 
     buildings:
         enabled: false
@@ -67,6 +77,14 @@
 styles:
     no_grid:
         base: polygons
+
+    no_dash:
+        base: lines
+
+    transit_dash:
+        base: lines
+        dash: [3, 2]
+        dash_background_color: global.white_color
 
     landuse:
         base: polygons

@@ -19,12 +19,22 @@
             draw:
                 lines:
                     visible: true
+                    style: no_dash
                     color: global.white_color
                     width: [[1, 1px], [20, 2px]]
                     outline:
+                        style: no_dash
                         color: global.black_color
                         width: [[1, 0.5px], [20, 5px]]
                         order: global.feature_order
+
+            other-tunnels:
+                filter:
+                    kind_detail: [rail, trunk_link, primary_link, motorway_link]
+                draw:
+                    lines:
+                        color: global.white_color
+                        width: [[11, 1px], [18, 2px]]
 
     transit:
         enabled: false
@@ -41,6 +51,10 @@
 styles:
     no_grid:
         base: polygons
+
+    no_dash:
+        base: lines
+
 
 
 
