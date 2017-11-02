@@ -1,0 +1,64 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+        river:
+            enabled: false
+
+        water-boundary-ocean:
+            draw:
+                lines:
+                    style: double-lines
+                    visible: true
+                    color: global.black_color
+                    width: [[1, 0px], [10, 4px], [20, 7px]]
+                    outline:
+                        color: global.black_color
+                        width: [[1, 0px], [10, 6px], [20, 10px]]
+
+        water_boundaries-not-ocean:
+            draw:
+                lines:
+                    visible: true
+                    color: global.black_color
+                    width: [[1, 0px], [10, 1px], [15, 1px], [15, 3px]]
+            riverbank:
+                draw:
+                    lines:
+                        visible: true
+                        color: global.black_color
+                        width: [[1, 0px], [10, 1px], [15, 1px], [15, 3px]]
+
+    roads:
+        enabled: false
+
+    transit:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+    double-lines:
+        base: lines
+        mix: [lines-outline]
+        shaders:
+            defines:
+                OUTLINE_WIDTH: 0.25
+                OUTLINE_COLOR: vec3(1.00,1.00,1.00)

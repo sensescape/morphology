@@ -97,6 +97,50 @@ layers:
                     lines:
                         color: global.white_color
 
+        water-boundary-ocean:
+            filter: { boundary: true, kind: ocean }
+            draw:
+                lines:
+                    visible: false
+                    order: global.feature_order
+                    join: round
+
+        water_boundaries-not-ocean:
+            filter:
+                all:
+                    - boundary: true
+                    - not: { kind: ocean }
+                    - $zoom: { min: 8 }
+                any:
+                    # limit show smaller landuse areas to higher zooms
+                    - { $zoom: [1],  area: { min: 10000000000 } }
+                    - { $zoom: [2],  area: { min: 7000000000 } }
+                    # some weird natural earth scale set transition
+                    - { $zoom: [3],  area: { min: 5000000000 } }
+                    - { $zoom: [4],  area: { min: 300000000 } }
+                    - { $zoom: [5],  area: { min: 50000000 } }
+                    - { $zoom: [6],  area: { min: 50000000 } }
+                    - { $zoom: [7],  area: { min: 50000000 } }
+                    - { $zoom: [8],  area: { min: 50000000 } }
+                    - { $zoom: [9],  area: { min: 15000000 } }
+                    - { $zoom: [10], area: { min: 4000000 } }
+                    - { $zoom: [11], area: { min: 1000000 } }
+                    - { $zoom: [12], area: { min: 250000 } }
+                    - { $zoom: [13], area: { min: 150000 } }
+                    - { $zoom: [14], area: { min: 40000 } }
+                    - { $zoom: { min: 15 } }
+            draw:
+                lines:
+                    visible: false
+                    order: global.feature_order
+                    join: round
+            riverbank:
+                filter: { kind: riverbank }
+                draw:
+                    lines:
+                        visible: false
+
+
         water-labels:
             filter:
                 all:
