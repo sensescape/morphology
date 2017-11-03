@@ -10,12 +10,16 @@
                 style: no_grid
 
         canals:
-            filter: { kind: canal }
             draw:
                 lines:
-                    order: global.feature_order
                     color: global.black_color
                     width: [[9, 3px], [18, 5px], [18, 8px]]
+
+        water-boundary-ocean:
+            enabled: false
+
+        water-boundaries-not-ocean:
+            enabled: false
 
     roads:
         enabled: false

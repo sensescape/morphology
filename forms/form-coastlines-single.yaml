@@ -19,7 +19,7 @@
                     color: global.black_color
                     width: [[1, 0px], [3, 1px], [16, 2px]]
 
-        water_boundaries-not-ocean:
+        water-boundaries-not-ocean:
             draw:
                 lines:
                     visible: true
@@ -51,11 +51,3 @@
 styles:
     no_grid:
         base: polygons
-
-    double-lines:
-        base: lines
-        mix: [lines-outline]
-        shaders:
-            defines:
-                OUTLINE_WIDTH: 0.25
-                OUTLINE_COLOR: vec3(1.00,1.00,1.00)

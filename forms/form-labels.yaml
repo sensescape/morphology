@@ -21,6 +21,15 @@ layers:
             polygons:
                 style: no_grid
 
+        river:
+            enabled: false
+
+        water-boundary-ocean:
+            enabled: false
+
+        water-boundaries-not-ocean:
+            enabled: false
+
         water-labels:
             draw:
                 text:

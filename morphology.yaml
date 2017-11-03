@@ -12,6 +12,7 @@ global:
     mid_color:                    [0.800,0.800,0.800]
     white_color:                  [1.00,1.00,1.00]
     brown_color:                  [0.760,0.659,0.608]
+    beige_color:                  [1.000,0.903,0.800]
 
     text_font_family:              'Cairo'
     text_size:                     [[1,10px],[20,15px]]
@@ -97,15 +98,23 @@ layers:
                     lines:
                         color: global.white_color
 
+        canals:
+            filter: { kind: canal }
+            draw:
+                lines:
+                    order: global.feature_order
+
         water-boundary-ocean:
             filter: { boundary: true, kind: ocean }
             draw:
                 lines:
-                    visible: false
+                    visible: true
                     order: global.feature_order
                     join: round
+                    color: global.beige_color
+                    width: [[1, 0px], [3, 1px]]
 
-        water_boundaries-not-ocean:
+        water-boundaries-not-ocean:
             filter:
                 all:
                     - boundary: true
@@ -131,15 +140,18 @@ layers:
                     - { $zoom: { min: 15 } }
             draw:
                 lines:
-                    visible: false
+                    visible: true
                     order: global.feature_order
                     join: round
+                    color: global.beige_color
+                    width: [[1, 0px], [3, 1px]]
             riverbank:
                 filter: { kind: riverbank }
                 draw:
                     lines:
-                        visible: false
-
+                        visible: true
+                        color: global.beige_color
+                        width: [[1, 0px], [3, 1px]]
 
         water-labels:
             filter:
@@ -208,7 +220,7 @@ layers:
                     $zoom: { min: 18 }
                 draw:
                     lines:
-                        style: railway_dash
+                        style: dash-railway
 
             service:
                 filter: { service: true }
@@ -374,7 +386,7 @@ layers:
             draw:
                 polygons:
                     visible: true
-                    style: landuse
+                    style: dash-terrain
                     color: global.black_color
 
         green:
@@ -386,7 +398,7 @@ layers:
             draw:
                 polygons:
                     visible: true
-                    style: landuse
+                    style: dash-terrain
                     color: global.black_color
 
         parking:
@@ -411,13 +423,13 @@ layers:
                 kind: winter_sports
             draw:
                 polygons:
-                    style: landuse
+                    style: dash-terrain
                     color: global.black_color
                     order: 18
                     visible: true
 
 styles:
-    landuse:
+    dash-terrain:
         base: polygons
         mix: [functions-zoom, elevation-dash]
         shaders:
@@ -430,7 +442,6 @@ styles:
                 DASH_COLOR: vec3(1.000,1.000,1.000)
                 DASH_BACKGROUND_COLOR: vec3(0.200,0.200,0.200)
                 DASH_SCALE: 12.
-                DASH_SIZE: 0.9
                 DASH_TYPE: fill
                 DASH_TILE_STYLE: tile
                 DASH_DIR: vec3(-0.600,-0.420,0.560)
@@ -455,7 +466,7 @@ styles:
                 DASH_TILE_STYLE: tile
                 DASH_TYPE: fill
 
-    railway_dash:
+    dash-railway:
         base: lines
         dash: [1, 0.15]
         dash_background_color: global.white_color

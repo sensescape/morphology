@@ -20,14 +20,14 @@
                     color: global.black_color
                     width: [[1, 0px], [3, 5px], [13, 6px], [13, 8px], [20, 60px]]
 
-            z10:
+            z13:
                 filter:
                     $zoom: { min: 13 }
                 draw:
                     lines:
                         style: coastline-animated
 
-        water_boundaries-not-ocean:
+        water-boundaries-not-ocean:
             draw:
                 lines:
                     style: coastline

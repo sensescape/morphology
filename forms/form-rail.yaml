@@ -5,9 +5,7 @@
                 style: no_grid
 
     water:
-        draw:
-            polygons:
-                style: no_grid
+        enabled: false
 
     roads:
         draw:
@@ -62,7 +60,7 @@
         enabled: false
 
 styles:
-    railway_dash:
+    dash-railway:
         base: lines
         dash: [1, 0.15]
         dash_background_color: global.white_color

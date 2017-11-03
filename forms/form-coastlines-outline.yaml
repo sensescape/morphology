@@ -23,7 +23,7 @@
                         color: global.black_color
                         width: [[1, 0px], [10, 6px], [20, 10px]]
 
-        water_boundaries-not-ocean:
+        water-boundaries-not-ocean:
             draw:
                 lines:
                     visible: true
