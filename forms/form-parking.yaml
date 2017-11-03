@@ -5,9 +5,7 @@ layers:
                 style: no_grid
 
     water:
-        draw:
-            polygons:
-                style: no_grid
+        enabled: false
 
     roads:
         enabled: false
@@ -59,4 +57,3 @@ styles:
                 DASH_COLOR: vec3(1.00,1.00,1.00)
                 DASH_TILE_STYLE: tile
                 DASH_TYPE: fill
-

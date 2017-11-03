@@ -8,9 +8,7 @@ layers:
                 style: no_grid
 
     water:
-        draw:
-            polygons:
-                style: no_grid
+        enabled: false
 
     roads:
         draw:

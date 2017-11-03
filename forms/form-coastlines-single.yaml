@@ -1,0 +1,53 @@
+﻿layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+
+        river:
+            enabled: false
+
+        water-boundary-ocean:
+            draw:
+                lines:
+                    visible: true
+                    color: global.black_color
+                    width: [[1, 0px], [3, 1px], [16, 2px]]
+
+        water-boundaries-not-ocean:
+            draw:
+                lines:
+                    visible: true
+                    color: global.black_color
+                    width: [[1, 0px], [10, 1px]]
+            riverbank:
+                draw:
+                    lines:
+                        visible: true
+                        color: global.black_color
+                        width: [[1, 0px], [10, 1px]]
+
+
+    roads:
+        enabled: false
+
+    transit:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons

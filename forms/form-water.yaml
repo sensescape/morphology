@@ -22,6 +22,12 @@
                         style: coast
                         color: global.black_color
 
+        water-boundary-ocean:
+            enabled: false
+
+        water-boundaries-not-ocean:
+            enabled: false
+
     roads:
         enabled: false
 

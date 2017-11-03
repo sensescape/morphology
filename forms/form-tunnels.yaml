@@ -5,9 +5,7 @@
                 style: no_grid
 
     water:
-        draw:
-            polygons:
-                style: no_grid
+        enabled: false
 
     roads:
         draw:
@@ -54,9 +52,3 @@ styles:
 
     no_dash:
         base: lines
-
-
-
-
-
-
