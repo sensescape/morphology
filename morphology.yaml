@@ -337,7 +337,7 @@ layers:
             draw:
                 lines:
                     color: global.black_color
-                    width: 1px #[[13, 0.75px], [17, 0.75px], [17, 1px]]
+                    width: 1px
                     visible: true
                 polygons:
                     color: global.white_color
