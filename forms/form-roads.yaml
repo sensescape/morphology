@@ -1,7 +1,4 @@
-﻿global:
-    single_width: 1px #[[1, 1px], [8, 0.75px], [12, 0.75px], [15, 1px]]
-
-layers:
+﻿layers:
     earth:
         draw:
             polygons:

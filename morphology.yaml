@@ -17,7 +17,7 @@ global:
     text_size:                     [[1,10px],[20,15px]]
     text_case:                     lowercase
 
-    single_width: 1px #[[1, 1px], [8, 0.75px], [12, 0.75px], [15, 1px]]
+    single_width: 1px
 
     # Sign up for a Mapzen API key to enjoy higher rate limits
     # https://mapzen.com/documentation/overview/#developer-accounts-and-api-keys
