@@ -19,7 +19,7 @@
         all-buildings:
             draw:
                 lines:
-                    width: [[13, 0.5px], [17, 1px]]
+                    width: [[13, 1px], [17, 1px]]
 
     landuse:
         enabled: false

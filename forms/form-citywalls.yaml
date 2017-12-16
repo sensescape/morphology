@@ -28,7 +28,7 @@ layers:
             draw:
                 lines:
                     color: global.black_color
-                    width: [[13, 0.5px], [18, 1px], [19, 2px]]
+                    width: [[13, 1px], [18, 1px], [19, 2px]]
                     visible: true
                 polygons:
                     color: global.white_color

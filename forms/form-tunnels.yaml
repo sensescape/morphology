@@ -25,7 +25,7 @@
                     outline:
                         style: no_dash
                         color: global.black_color
-                        width: [[1, 0.5px], [20, 5px]]
+                        width: [[1, 1px], [20, 5px]]
                         order: global.feature_order
 
             other-tunnels:
