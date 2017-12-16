@@ -15,7 +15,7 @@
                 lines:
                     style: riverlines
                     color: global.mid_color
-                    width: [[11, 2px], [ 18, 8px]]
+                    width: [[11, 2px], [18, 8px]]
             intermittent:
                 draw:
                     lines:

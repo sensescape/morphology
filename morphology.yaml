@@ -18,7 +18,7 @@ global:
     text_size:                     [[1,10px],[20,15px]]
     text_case:                     lowercase
 
-    single_width: [[1, 1px], [8, 0.75px], [12, 0.5px], [15, 1px]]
+    single_width: 1px
 
     # Sign up for a Mapzen API key to enjoy higher rate limits
     # https://mapzen.com/documentation/overview/#developer-accounts-and-api-keys
@@ -247,7 +247,7 @@ layers:
                 draw:
                     lines:
                         color: global.black_color
-                        width: [[11, 0.5px], [16, 2px], [18, 4m]]
+                        width: [[11, 1px], [16, 2px], [18, 4m]]
 
         winter_sport_pistes:
             filter: { kind: piste }
@@ -257,7 +257,7 @@ layers:
                     cap: round
                     join: round
                     color: global.black_color
-                    width: [[13, 0.5px], [16, 1px], [16, 2px], [18, 1m]]
+                    width: [[13, 1px], [16, 1px], [16, 2px], [18, 1m]]
 
         aerialway:
             filter: { kind: aerialway }
@@ -337,7 +337,7 @@ layers:
             draw:
                 lines:
                     color: global.black_color
-                    width: [[13, 0.35px], [17, 0.35px], [17, 1px]]
+                    width: 1px #[[13, 0.75px], [17, 0.75px], [17, 1px]]
                     visible: true
                 polygons:
                     color: global.white_color

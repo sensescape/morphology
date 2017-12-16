@@ -14,7 +14,7 @@ layers:
             draw:
                 lines:
                     color: global.white_color
-                    width: [[11, 0.5px], [ 18, 8px]]
+                    width: [[11, 1px], [18, 8px]]
             intermittent:
                 draw:
                     lines:
