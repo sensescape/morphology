@@ -22,7 +22,7 @@ global:
 
     # Sign up for a Mapzen API key to enjoy higher rate limits
     # https://mapzen.com/documentation/overview/#developer-accounts-and-api-keys
-    sdk_mapzen_api_key: 'mapzen-Xz1zvxc'     # set this value to your Mapzen API key
+    sdk_api_key: '3eqm2_bfTNGZ85ar20fVyA'     # set this value to your Mapzen API key
 
     # default order for basemap features
     feature_order: function() { return feature.sort_rank || 0;; }
@@ -31,14 +31,14 @@ global:
 sources:
     mapzen:
         type: MVT
-        url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.mvt
+        url: https://tile.nextzen.org/tilezen/vector/v1/256/all/{z}/{x}/{y}.mvt
         url_params:
-            api_key: global.sdk_mapzen_api_key
+            api_key: global.sdk_api_key
         rasters: [normals-elevation]
         max_zoom: 16
     normals-elevation:
         type: Raster
-        url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png
+        url: https://tile.nextzen.org/tilezen/terrain/v1/256/normal/{z}/{x}/{y}.png
         url_params:
             api_key: global.sdk_mapzen_api_key
         max_zoom: 15
