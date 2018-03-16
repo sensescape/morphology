@@ -14,10 +14,10 @@
     <title>Morphology</title>
 
     <!-- Mapzen JS & styleguide -->
-    <link rel="stylesheet" href="https://mapzen.com/js/mapzen.css" />
-    <link rel="stylesheet" href="https://mapzen.com/common/styleguide/styles/styleguide.css">
+    <link rel="stylesheet" href="https://www.nextzen.org/js/nextzen.css" />
+    <link rel="stylesheet" href="https://www.nextzen.org/styleguide.min.css">
 
-    <script src="https://mapzen.com/js/mapzen.js"></script>
+    <script src="https://www.nextzen.org/js/nextzen.js"></script>
     <!-- FileSaver.js implements the HTML5 W3C saveAs(), used in the demo to save screenshots -->
     <script type="text/javascript" src="lib/FileSaver.js"></script>
 
@@ -377,8 +377,7 @@
     };
 
     /* global variables */
-    var tg_baseScene = 'morphology.yaml';
-    var tg_global = { sdk_api_key: '3eqm2_bfTNGZ85ar20fVyA' };
+    var tg_baseScene = './morphology.yaml';
 
     var popup = document.getElementById('popup');
 
@@ -387,13 +386,13 @@
     var layer, scene;
 
     /*** Map ***/
-    L.Mapzen.apiKey = tg_global.sdk_api_key;
 
     var map = L.Mapzen.map('map', {
+      "iframeDetection": true,
       "keyboardZoomOffset" : .05,
       "scrollWheelZoom": true,
       tangramOptions: {
-          scene: tg_baseScene
+        scene: tg_baseScene
       }
     });
 
@@ -403,7 +402,7 @@
 
 
 
-    L.Mapzen.geocoder().addTo(map);
+    L.Mapzen.geocoder('geocode-earth-key').addTo(map);
 
     map.on('tangramloaded', function(e) {
       layer = e.tangramLayer;
