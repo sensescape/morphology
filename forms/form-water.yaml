@@ -19,7 +19,7 @@
             intermittent:
                 draw:
                     lines:
-                        style: coast
+                        style: riverlines
                         color: global.black_color
 
         water-boundary-ocean:
@@ -177,7 +177,7 @@ styles:
                     float stripes(vec2 st){
                         st = rotate2d(3.14159265358*-0.25 )*st;
                         //return step(.9,1.0-smoothstep(.5,1.,abs(sin(st.x*3.14159265358))));
-                        return step(.75,1.0-smoothstep(.75,1.,abs(sin(st.x*3.14159265358)))); // more spaced out stripes?
+                        return step(1.0,1.0-smoothstep(.65,1.,abs(sin(st.x*3.14159265358)))); // more spaced out stripes?
                     }
                 color: |
                     vec2 st = getConstantCoords();

@@ -16,7 +16,7 @@
             draw:
                 lines:
                     visible: true
-                    width: [[13, 2px], [19, 10px], [19, 16px]]
+                    width: [[13, 2px], [19, 7.5px], [19, 25px]]
 
     transit:
         enabled: false
