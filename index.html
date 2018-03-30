@@ -1,10 +1,4 @@
 <!doctype html>
-<!--
-    Tangram: real-time WebGL rendering for OpenStreetMap
-
-    http://github.com/tangrams/tangram
-    http://mapzen.com
--->
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
@@ -531,8 +525,7 @@
           themes_as_array.push( all_theme_imports.form );
       }
 
-      scene.load({ import: themes_as_array, global: tg_global });
-      scene.updateConfig();
+      scene.load({ import: themes_as_array });
     }
 
     function updateSceneWithForm (value) {
