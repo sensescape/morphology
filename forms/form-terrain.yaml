@@ -1,0 +1,95 @@
+sources:
+    mapzen:
+        rasters:
+            - normals
+    normals:
+        type: Raster
+        url: https://tile.nextzen.org/tilezen/terrain/v1/512/normal/{z}/{x}/{y}.png
+        url_params:
+            api_key: global.sdk_api_key
+        tile_size: 512
+        max_zoom: 14
+
+
+layers:
+    earth:
+        draw:
+            polygons:
+                style: terrain
+                color: global.white_color
+
+    water:
+        draw:
+            polygons:
+                style: no_grid
+                color: global.white_color
+
+        river:
+            draw:
+                lines:
+                    color: global.white_color
+                    width: [[11, 2px], [18, 10px]]
+            intermittent:
+                draw:
+                    lines:
+                        color: global.white_color
+
+        water-boundary-ocean:
+            enabled: false
+
+        water-boundaries-not-ocean:
+            enabled: false
+
+    roads:
+        enabled: false
+
+    transit:
+        enabled: false
+
+    buildings:
+        enabled: false
+
+    platforms:
+        enabled: false
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+    terrain:
+        base: polygons
+        lighting: false
+        raster: normal
+        shaders:
+            uniforms:
+                u_envmap: images/morphology-sphere-map1.jpg
+                u_contrast: 1.
+                u_zoom_scale: 3.5
+                u_brightness_base: 0.5
+                u_brightness_scaler: 0.5
+            blocks:
+                global: |
+                    // Simplified view-independent environment map
+                    vec4 applyEnvmap (in sampler2D _tex, in vec3 _normal, in float scale) {
+                        _normal.z *= scale;
+                        return texture2D(_tex, .5*(normalize(_normal).xy + 1.));
+                    }
+                color: |
+                    // turn terrain exaggeration up/down
+                    // fade out spheremap normals with a function
+                    float scale1 = 20./(u_map_position.z + 1.0) + 1.5;
+                    float m = u_zoom_scale * (u_map_position.z + 0.4) * exp(u_map_position.z * -.29);
+                    m = clamp(m, 0., 1.5);
+                    color = applyEnvmap(u_envmap, normal, 1./scale1);
+
+                    // apply contrast and brightness
+                    float contrast = m;
+                    color.rgb = ((color.rgb - 0.5) * max(contrast, 0.)) + 0.5;
+                    float brightness = u_brightness_base - m * u_brightness_scaler;
+                    color.rgb += brightness;
+
+                    // apply layer color
+                    color *= v_color;

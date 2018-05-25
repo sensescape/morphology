@@ -1,0 +1,57 @@
+﻿cameras:
+    cam:
+        type: isometric
+        vanishing_point: [0, -500]
+
+layers:
+    earth:
+        draw:
+            polygons:
+                style: no_grid
+
+    water:
+        enabled: false
+
+    roads:
+        enabled: false
+
+    transit:
+        enabled: false
+
+    buildings:
+        all-buildings:
+            draw:
+                lines:
+                    width: [[13, 1px], [17, 1px]]
+            extruded:
+                filter: { $zoom: { min: 15 } }
+                draw:
+                    polygons:
+                        color: global.white_color
+                        style: buildings-stripes
+                        extrude: function () { return feature.height > 0 || $zoom >= 16; }
+
+    landuse:
+        enabled: false
+
+styles:
+    no_grid:
+        base: polygons
+
+    buildings-stripes:
+        base: polygons
+        texcoords: true
+        shaders:
+            blocks:
+                color: |
+                    float y = v_texcoord.y*12.0;
+                    float v = v_texcoord.y;
+                    //color.rgb = mix(vec3(0.0,0.0,0.0),color.rgb,v);
+                    color.rgb = mix(color.rgb,vec3(0.0,0.0,0.0),mod(floor(y),2.0));
+
+                    if ( dot(vec3(0.,0.,1.),normal) == 1.0 ) {
+                        // If it's a roof
+                        color.rgb = vec3(1.0,1.0,1.0);
+                    }
+
+
